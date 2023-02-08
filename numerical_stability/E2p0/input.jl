@@ -45,10 +45,10 @@ output("\n\n## Time evolution Started")
 ### TIME EVOLUTION COMPUTATION
 
 # Time range
-Tfvals = [2, 3, 4, 5, 6, 7, 8]
+Tfvals = [4, 5, 6, 7, 8, 10, 12, 15]
 for Tf in Tfvals
 
-    tvals = 0:0.01:Tf
+    tvals = 0:0.005:Tf
 
     output("\nInitial time:     0.0   ps")
     output("Final time:       {:5.3f} ps", Tf)

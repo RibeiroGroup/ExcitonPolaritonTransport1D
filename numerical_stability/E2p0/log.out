@@ -1,5 +1,5 @@
 Initilizing Simulation.
-February, 07 2023 - 17:29:41
+February, 08 2023 - 13:35:31
            ---Quantum System Input Parameters---       
 
               # Light-Matter Interaction #             
@@ -37,7 +37,7 @@ Populating off-diagonal... Done.
 BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
 BLAS Number of Threads: 28
 
-Diagonalization started... Done in  523.15043 seconds.
+Diagonalization started... Done in  531.69983 seconds.
 
 
  --- System Summary
@@ -95,32 +95,10 @@ System energies saved as "eigenenergies" in /fire/ribeiro/gjribei/QuantumEnergyD
 ## Time evolution Started
 
 Initial time:     0.0   ps
-Final time:       2.000 ps
-Time intervals:   0.010 ps
-
-Total Number of steps:  201
-
-
-• Wavepacket created with σ = 120 nm centered at 25000.0 nm
-"Mode weight computed up to Tf = 2 saved.
-
-
-Initial time:     0.0   ps
-Final time:       3.000 ps
-Time intervals:   0.010 ps
-
-Total Number of steps:  301
-
-
-• Wavepacket created with σ = 120 nm centered at 25000.0 nm
-"Mode weight computed up to Tf = 3 saved.
-
-
-Initial time:     0.0   ps
 Final time:       4.000 ps
 Time intervals:   0.010 ps
 
-Total Number of steps:  401
+Total Number of steps:  801
 
 
 • Wavepacket created with σ = 120 nm centered at 25000.0 nm
@@ -131,7 +109,7 @@ Initial time:     0.0   ps
 Final time:       5.000 ps
 Time intervals:   0.010 ps
 
-Total Number of steps:  501
+Total Number of steps:  1001
 
 
 • Wavepacket created with σ = 120 nm centered at 25000.0 nm
@@ -142,7 +120,7 @@ Initial time:     0.0   ps
 Final time:       6.000 ps
 Time intervals:   0.010 ps
 
-Total Number of steps:  601
+Total Number of steps:  1201
 
 
 • Wavepacket created with σ = 120 nm centered at 25000.0 nm
@@ -153,7 +131,7 @@ Initial time:     0.0   ps
 Final time:       7.000 ps
 Time intervals:   0.010 ps
 
-Total Number of steps:  701
+Total Number of steps:  1401
 
 
 • Wavepacket created with σ = 120 nm centered at 25000.0 nm
@@ -164,12 +142,45 @@ Initial time:     0.0   ps
 Final time:       8.000 ps
 Time intervals:   0.010 ps
 
-Total Number of steps:  801
+Total Number of steps:  1601
 
 
 • Wavepacket created with σ = 120 nm centered at 25000.0 nm
 "Mode weight computed up to Tf = 8 saved.
 
+
+Initial time:     0.0   ps
+Final time:       10.000 ps
+Time intervals:   0.010 ps
+
+Total Number of steps:  2001
+
+
+• Wavepacket created with σ = 120 nm centered at 25000.0 nm
+"Mode weight computed up to Tf = 10 saved.
+
+
+Initial time:     0.0   ps
+Final time:       12.000 ps
+Time intervals:   0.010 ps
+
+Total Number of steps:  2401
+
+
+• Wavepacket created with σ = 120 nm centered at 25000.0 nm
+"Mode weight computed up to Tf = 12 saved.
+
+
+Initial time:     0.0   ps
+Final time:       15.000 ps
+Time intervals:   0.010 ps
+
+Total Number of steps:  3001
+
+
+• Wavepacket created with σ = 120 nm centered at 25000.0 nm
+"Mode weight computed up to Tf = 15 saved.
+
 Time evolution computations finished.
 Exiting code sucessfully.
-February, 07 2023 - 17:39:42
+February, 08 2023 - 13:49:17
