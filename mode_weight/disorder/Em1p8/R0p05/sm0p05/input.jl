@@ -4,6 +4,7 @@ using LinearAlgebra
 using Unitful
 using HDF5
 using Statistics
+using UnicodePlots
 using Dates
 
 output("Initilizing Simulation.")
@@ -12,7 +13,7 @@ output(Dates.format(now(), "U, dd yyyy - HH:MM:SS"))
 path = joinpath(@__DIR__, "out.h5")
 
 # Total number of realizations 
-NR_T = 100
+NR_T = 25
 
 # Number of cavity modes
 NC = 200
@@ -22,6 +23,14 @@ NC = 200
 
 MW_q0 = zeros((2NC+1), length(σxvals), NR_T)
 MW_qnz = zeros((2NC+1), length(σxvals), NR_T)
+EARLY_MW_q0 = zeros((2NC+1), length(σxvals), NR_T)
+EARLY_MW_qnz = zeros((2NC+1), length(σxvals), NR_T)
+
+# Time range
+tvals = 0:0.005:5
+
+phot_cont_q0 = zeros(length(tvals), length(σxvals), NR_T)
+phot_cont_qnz = zeros(length(tvals), length(σxvals), NR_T)
 
 for NR in 1:NR_T
     output("Starting realization $NR")
@@ -34,9 +43,9 @@ for NR in 1:NR_T
         Nc = NC,
         Nm = 5000,
         a  = 10.0nm,
-        σa = 0.0,
+        σa = 1.0,
         ωM = 1.8eV,
-        σM = 0.0,
+        σM = 0.05,
         Ly = 200nm,
         Lz = 400nm,
         nz = 1,
@@ -55,8 +64,6 @@ for NR in 1:NR_T
     output("\n\n## Time evolution Started")
     ### TIME EVOLUTION COMPUTATION
     
-    # Time range
-    tvals = 0:0.005:5
     
     output("\nInitial time:     0.0   ps")
     output("Final time:       {:5.3f} ps", tvals[end])
@@ -79,7 +86,14 @@ for NR in 1:NR_T
             time_propagate!(new, wvp, sys, tvals[i])
     
             # Save wavepacket in the local basis
-            MW_q0[:,σi,NR] .+= abs2.(sys.Uix * new)[sys.phot_range]
+            mode_weight = abs2.(sys.Uix * new)[sys.phot_range]
+            MW_q0[:,σi,NR] .+= mode_weight
+            phot_cont_q0[i,σi,NR] = sum(mode_weight)
+
+            # Save early results
+            if i < 102
+                EARLY_MW_q0[:,σi,NR] += mode_weight
+            end
         end
 
         # Evolution for q0 > 0
@@ -93,7 +107,15 @@ for NR in 1:NR_T
             time_propagate!(new, wvp, sys, tvals[i])
 
             # Save wavepacket in the local basis
-            MW_qnz[:,σi,NR] += abs2.(sys.Uix * new)[sys.phot_range]
+            mode_weight = abs2.(sys.Uix * new)[sys.phot_range]
+            MW_qnz[:,σi,NR] += mode_weight
+            phot_cont_qnz[i,σi,NR] = sum(mode_weight)
+
+            # Save early results
+            if i < 102
+                EARLY_MW_qnz[:,σi,NR] += mode_weight
+            end
+
         end
     end # σx loop
     output("Realization $NR finished.")
@@ -102,6 +124,9 @@ end # NR loop
 # Divide it by the number of time steps to get an average over time
 MW_q0 ./= length(tvals)
 MW_qnz ./= length(tvals)
+
+EARLY_MW_q0 ./= 101
+EARLY_MW_qnz ./= 101
 
 output("Computing averages...")
 for σi = 1:3
@@ -114,6 +139,14 @@ for σi = 1:3
     h5write(path, "nzq_$(σx)_avg_mode_weight", [mean(MW_qnz[i,σi,:]) for i = axes(MW_qnz, 1)])
     h5write(path, "nzq_$(σx)_std_mode_weight", [mean(MW_qnz[i,σi,:]) for i = axes(MW_qnz, 1)])
 
+    h5write(path, "EARLY_$(σx)_avg_mode_weight", [mean(EARLY_MW_q0[i,σi,:]) for i = axes(EARLY_MW_q0, 1)])
+    h5write(path, "EARLY_$(σx)_std_mode_weight", [mean(EARLY_MW_q0[i,σi,:]) for i = axes(EARLY_MW_q0, 1)])
+
+    h5write(path, "EARLY_nzq_$(σx)_avg_mode_weight", [mean(EARLY_MW_qnz[i,σi,:]) for i = axes(EARLY_MW_qnz, 1)])
+    h5write(path, "EARLY_nzq_$(σx)_std_mode_weight", [mean(EARLY_MW_qnz[i,σi,:]) for i = axes(EARLY_MW_qnz, 1)])
+
+    h5write(path, "q0_$(σx)_phot_cont", [mean(phot_cont_q0[i,σi,:]) for i = axes(phot_cont_q0, 1)])
+    h5write(path, "nzq_$(σx)_phot_cont", [mean(phot_cont_qnz[i,σi,:]) for i = axes(phot_cont_qnz, 1)])
 end
 output("Done.")
 
