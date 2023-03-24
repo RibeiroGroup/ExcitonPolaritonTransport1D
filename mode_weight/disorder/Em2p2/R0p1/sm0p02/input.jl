@@ -13,7 +13,7 @@ output(Dates.format(now(), "U, dd yyyy - HH:MM:SS"))
 path = joinpath(@__DIR__, "out.h5")
 
 # Total number of realizations 
-NR_T = 25
+NR_T = 50
 
 # Number of cavity modes
 NC = 200
@@ -121,32 +121,25 @@ for NR in 1:NR_T
     output("Realization $NR finished.")
 end # NR loop
 
-# Divide it by the number of time steps to get an average over time
-MW_q0 ./= length(tvals)
-MW_qnz ./= length(tvals)
-
-EARLY_MW_q0 ./= 101
-EARLY_MW_qnz ./= 101
-
 output("Computing averages...")
 for σi = 1:3
 
     σx = σxvals[σi]
     
     h5write(path, "$(σx)_avg_mode_weight", [mean(MW_q0[i,σi,:]) for i = axes(MW_q0, 1)])
-    h5write(path, "$(σx)_std_mode_weight", [mean(MW_q0[i,σi,:]) for i = axes(MW_q0, 1)])
+    h5write(path, "$(σx)_std_mode_weight", [std(MW_q0[i,σi,:]) for i = axes(MW_q0, 1)])
 
     h5write(path, "nzq_$(σx)_avg_mode_weight", [mean(MW_qnz[i,σi,:]) for i = axes(MW_qnz, 1)])
-    h5write(path, "nzq_$(σx)_std_mode_weight", [mean(MW_qnz[i,σi,:]) for i = axes(MW_qnz, 1)])
+    h5write(path, "nzq_$(σx)_std_mode_weight", [std(MW_qnz[i,σi,:]) for i = axes(MW_qnz, 1)])
 
     h5write(path, "EARLY_$(σx)_avg_mode_weight", [mean(EARLY_MW_q0[i,σi,:]) for i = axes(EARLY_MW_q0, 1)])
-    h5write(path, "EARLY_$(σx)_std_mode_weight", [mean(EARLY_MW_q0[i,σi,:]) for i = axes(EARLY_MW_q0, 1)])
+    h5write(path, "EARLY_$(σx)_std_mode_weight", [std(EARLY_MW_q0[i,σi,:]) for i = axes(EARLY_MW_q0, 1)])
 
     h5write(path, "EARLY_nzq_$(σx)_avg_mode_weight", [mean(EARLY_MW_qnz[i,σi,:]) for i = axes(EARLY_MW_qnz, 1)])
-    h5write(path, "EARLY_nzq_$(σx)_std_mode_weight", [mean(EARLY_MW_qnz[i,σi,:]) for i = axes(EARLY_MW_qnz, 1)])
+    h5write(path, "EARLY_nzq_$(σx)_std_mode_weight", [std(EARLY_MW_qnz[i,σi,:]) for i = axes(EARLY_MW_qnz, 1)])
 
     h5write(path, "q0_$(σx)_phot_cont", [mean(phot_cont_q0[i,σi,:]) for i = axes(phot_cont_q0, 1)])
-    h5write(path, "nzq_$(σx)_phot_cont", [mean(phot_cont_qnz[i,σi,:]) for i = axes(phot_cont_qnz, 1)])
+    h5write(path, "nzq_$(σx)_phot_cont", [std(phot_cont_qnz[i,σi,:]) for i = axes(phot_cont_qnz, 1)])
 end
 output("Done.")
 
