@@ -82,14 +82,14 @@ function plot_error()
     fig = Figure()
 
     # Create axis into the figure
-    ylab = "Error"
-    ax1 = Axis(fig[1,1], xlabel=L"\mathrm{Number}\;\mathrm{of}\;\mathrm{cavity}\;\mathrm{modes}", ylabel=ylab)
-    ax2 = Axis(fig[2,1], xlabel=L"\mathrm{Cavity}\;\mathrm{energy}\;\mathrm{cutoff}\;(\mathrm{eV})", ylabel=ylab)
+    ax1 = Axis(fig[1,1], xlabel="Number of cavity modes", title="(a)", titlealign = :left)
+    ax2 = Axis(fig[2,1], xlabel="Cavity energy cutoff (eV)", title="(b)", titlealign = :left)
+    Label(fig[1:end,0], "Error", rotation=pi/2)
     
     # Axis configuration
     xlims!(ax1, 50, 1050)
     xlims!(ax2, (2,3.5))
-    ylims!(ax2, (-0.05,0.8))
+    ylims!(ax2, (-0.05,0.9))
     linkyaxes!(ax1, ax2)
 
     # List with number of molecules for each panel
@@ -101,10 +101,14 @@ function plot_error()
     # Different markers to be used for each Nc value
     mkers = [:circle, :rect, :utriangle, :diamond, :star5]
 
+    # Slice of the simulation used to compute error
+    # 501 = 5 ps
+    slice = 1:101
+    println("AAAAAAAAAA")
     for (Nm, mk) in zip(Nmvals, mkers)
 
         # Get reference data - Nc = 1601 - Note that we are computing d
-        ref = 0.1 .* sqrt.(h5read(get_path(Nm, 800, 0.1), "mean_square_disp")) 
+        ref = 0.1 .* sqrt.(h5read(get_path(Nm, 800, 0.1), "mean_square_disp")[slice]) 
 
         # Preallocate arrays for cavity energies and error values
         err_vals = zeros(5)
@@ -112,7 +116,7 @@ function plot_error()
         for (j,Nc) in enumerate(Ncvals)
 
             # Fetch data for given Nc
-            d = 0.1 .* sqrt.(h5read(get_path(Nm, Nc, 0.1), "mean_square_disp"))
+            d = 0.1 .* sqrt.(h5read(get_path(Nm, Nc, 0.1), "mean_square_disp")[slice])
             
             # Read output files to find the maximum cavity energy (i.e. energy cutoff)
             open(get_path(Nm, Nc, 0.1, "log.out"), "r") do io
@@ -129,7 +133,7 @@ function plot_error()
         end
 
         # Produce scatter and line plots
-        scatter!(ax1, (2 .* Ncvals .+ 1), err_vals, label=L"N_M = %$(Nm)", marker=mk)
+        scatter!(ax1, (2 .* Ncvals .+ 1), err_vals, label="$(Nm)", marker=mk)
         lines!(ax1, (2 .* Ncvals .+ 1), err_vals)
 
         scatter!(ax2, cav_e, err_vals, marker=mk)
@@ -140,9 +144,12 @@ function plot_error()
         header = ["Nc", "Energy (eV)", "Error"])
     end
 
-    lines!(ax2, 2:0.05:3.5, [0.8*exp(-7*(e-2)) for e in 2:0.05:3.5], color=:black, linestyle=:dash, label=L"\exp[-\alpha(E_\mathrm{cutoff}-E_\mathrm{min})]")
+    lines!(ax2, 2:0.05:3.5, [0.8*exp(-9.5*(e-2)) for e in 2:0.05:3.5], color=:black, linestyle=:dash, label=L"\exp[-\alpha(E_\mathrm{cutoff}-E_\mathrm{min})]")
 
-    axislegend(ax1)
+    #axislegend(title=L"N_\mathrm{M}", ax = ax1)
+    Legend(fig[1:end,2], ax1, L"N_\mathrm{M}") 
+    #tellheight = false,
+    #tellwidth = false,)
     axislegend(ax2)
 
     fig
@@ -164,7 +171,7 @@ function plot_dis_propagation(σM)
 
     for Nc in [50, 75, 100, 200, 400, 500, 800]
 
-        d = h5read(joinpath(@__DIR__, "disorder/$(σM)/Nc$Nc/out.h5"), "NR_100_sm60_avg_mode_weight")
+        d = h5read(joinpath(@__DIR__, "disorder/R0p1/$(σM)/Nc$Nc/out.h5"), "NR_100_sm60_avg_mode_weight")
         lines!(ax, tvals, d, label = L"N_c= %$(Nc)")
     end
 
@@ -185,8 +192,8 @@ function plot_realizations(σM)
 
     for NR in [20, 40, 60, 80, 100]
 
-        d = h5read(joinpath(@__DIR__, "disorder/$(σM)/Nc800/out.h5"), "NR_$(NR)_sm60_avg_mode_weight")
-        σ = h5read(joinpath(@__DIR__, "disorder/$(σM)/Nc800/out.h5"), "NR_$(NR)_sm60_std_mode_weight")
+        d = h5read(joinpath(@__DIR__, "disorder/R0p1/$(σM)/Nc800/out.h5"), "NR_$(NR)_sm60_avg_mode_weight")
+        σ = h5read(joinpath(@__DIR__, "disorder/R0p1/$(σM)/Nc800/out.h5"), "NR_$(NR)_sm60_std_mode_weight")
         lines!(ax, tvals, d, label = L"N_R= %$(NR)")
         band!(ax, tvals, d .- σ, d .+ σ)
     end
@@ -202,11 +209,15 @@ function plot_dis_error(;NR = 100, σx = 60)
     set_theme!(fontsize_theme)
 
     # Create figure object
-    fig = Figure(resolution=(800,400))
+    #fig = Figure(resolution=(800,400))
+    fig = Figure()
 
     # Create axis into the figure
-    ylab = "Error"
-    ax1 = Axis(fig[1,1], xlabel="Cavity energy cutoff (eV)", ylabel=ylab)
+    ax1 = Axis(fig[1,1], title="(a)", titlealign = :left)
+    ax2 = Axis(fig[2,1], title="(b)", titlealign = :left, xlabel="Cavity energy cutoff (eV)")
+    linkyaxes!(ax1, ax2)
+    linkxaxes!(ax1, ax2)
+    Label(fig[1:end,0], "Error", rotation=pi/2)
 
     # List with number of cavity modes
     Ncvals = [0, 1, 5, 10, 20, 35, 50, 75, 100]
@@ -216,23 +227,21 @@ function plot_dis_error(;NR = 100, σx = 60)
     err_devs = zeros(length(Ncvals))
     cav_e = zeros(length(Ncvals))
 
-    # Energetic disorder values
-    σMvals = [0.005, 0.02, 0.05, 0.1]
-
     # Slice on time steps - this controls whether we average early or late propagation times
-    slice = 1:501
+    slice = 1:101
 
     # Different markers to be used for each Nc value
     mkers = [:circle, :rect, :utriangle, :diamond]
 
-    for (mk, σM) in zip(mkers, σMvals)
+    # Plot results for ΩR = 0.1 onto axis 1
+    for (mk, σM) in zip(mkers, [0.005, 0.02, 0.05, 0.1])
 
         σMstr = "sm" * replace(string(σM), '.'=>'p')
         r = 10 * σM
 
         # Get data for Nc = 1601V
-        ref = h5read(joinpath(@__DIR__, "disorder/$(σMstr)/Nc800/out.h5"), "NR_$(NR)_sm$(σx)_avg_mode_weight")[slice]
-        std_ref = h5read(joinpath(@__DIR__, "disorder/$(σMstr)/Nc800/out.h5"), "NR_$(NR)_sm$(σx)_std_mode_weight")[slice]
+        ref = h5read(joinpath(@__DIR__, "disorder/Em2p0/R0p1/$(σMstr)/Nc800/out.h5"), "NR_$(NR)_sm$(σx)_avg_mode_weight")[slice]
+        std_ref = h5read(joinpath(@__DIR__, "disorder/Em2p0/R0p1/$(σMstr)/Nc800/out.h5"), "NR_$(NR)_sm$(σx)_std_mode_weight")[slice]
 
         # Create Measurement objects, with the standard deviation representing the error of d
         ref_mmt = [measurement(ref[i], std_ref[i]) for i = eachindex(ref)]
@@ -240,14 +249,14 @@ function plot_dis_error(;NR = 100, σx = 60)
         for (j,Nc) in enumerate(Ncvals)
 
             # Fetch d values along with their standard deviation
-            d = h5read(joinpath(@__DIR__, "disorder/$(σMstr)/Nc$Nc/out.h5"), "NR_$(NR)_sm$(σx)_avg_mode_weight")[slice]
-            std = h5read(joinpath(@__DIR__, "disorder/$(σMstr)/Nc$Nc/out.h5"), "NR_$(NR)_sm$(σx)_std_mode_weight")[slice]
+            d = h5read(joinpath(@__DIR__, "disorder/Em2p0/R0p1/$(σMstr)/Nc$Nc/out.h5"), "NR_$(NR)_sm$(σx)_avg_mode_weight")[slice]
+            std = h5read(joinpath(@__DIR__, "disorder/Em2p0/R0p1/$(σMstr)/Nc$Nc/out.h5"), "NR_$(NR)_sm$(σx)_std_mode_weight")[slice]
 
             # Create Measurement objects, with the standard deviation representing the error of d
-            d_mmt = [measurement(d[i], std[i]) for i = eachindex(d)]
+            d_mmt = [measurement(d[i], 2 .* std[i]) for i = eachindex(d)]
 
             # Read output files to find the maximum cavity energy (i.e. energy cutoff)
-            open(joinpath(@__DIR__, "disorder/$(σMstr)/Nc$Nc/log.out"), "r") do io
+            open(joinpath(@__DIR__, "disorder/Em2p0/R0p1/$(σMstr)/Nc$Nc/log.out"), "r") do io
                 m = match(r"Maximum Cavity energy:\s+?(\d+?\.\d+)", read(io, String))
                 if isnothing(m)
                     println("Couldnt match $(get_path(Nm, Nc, 0.1, "log.out"))")
@@ -263,12 +272,57 @@ function plot_dis_error(;NR = 100, σx = 60)
         end
 
         # Produce plots
-        scatter!(ax1, cav_e, err_vals, label=L"\sigma_M/\Omega_\mathrm{R} = %$(r)", marker=mk)
+        scatter!(ax1, cav_e, err_vals, label="$r", marker=mk)
         lines!(ax1, cav_e, err_vals)
         errorbars!(ax1, cav_e, err_vals, err_devs, color=:red)
 
     end
 
-    axislegend(ax1)
+    # Plot results for ΩR = 0.2 onto axis 2
+    for (mk, σM) in zip(mkers, [0.01, 0.04, 0.1, 0.2])
+
+        σMstr = "sm" * replace(string(σM), '.'=>'p')
+        r =  5 * σM
+
+        # Get data for Nc = 1601V
+        ref = h5read(joinpath(@__DIR__, "disorder/Em2p0/R0p2/$(σMstr)/Nc800/out.h5"), "NR_$(NR)_sm$(σx)_avg_d")[slice]
+        std_ref = h5read(joinpath(@__DIR__, "disorder/Em2p0/R0p2/$(σMstr)/Nc800/out.h5"), "NR_$(NR)_sm$(σx)_std_d")[slice]
+
+        # Create Measurement objects, with the standard deviation representing the error of d
+        ref_mmt = [measurement(ref[i], std_ref[i]) for i = eachindex(ref)]
+
+        for (j,Nc) in enumerate(Ncvals)
+
+            # Fetch d values along with their standard deviation
+            d = h5read(joinpath(@__DIR__, "disorder/Em2p0/R0p2/$(σMstr)/Nc$Nc/out.h5"), "NR_$(NR)_sm$(σx)_avg_d")[slice]
+            std = h5read(joinpath(@__DIR__, "disorder/Em2p0/R0p2/$(σMstr)/Nc$Nc/out.h5"), "NR_$(NR)_sm$(σx)_std_d")[slice]
+
+            # Create Measurement objects, with the standard deviation representing the error of d
+            d_mmt = [measurement(d[i], 2 .* std[i]) for i = eachindex(d)]
+
+            # Read output files to find the maximum cavity energy (i.e. energy cutoff)
+            open(joinpath(@__DIR__, "disorder/Em2p0/R0p2/$(σMstr)/Nc$Nc/log.out"), "r") do io
+                m = match(r"Maximum Cavity energy:\s+?(\d+?\.\d+)", read(io, String))
+                if isnothing(m)
+                    println("Couldnt match $(get_path(Nm, Nc, 0.1, "log.out"))")
+                else
+                    cav_e[j] = parse(Float64, m.captures[1])
+                end
+            end
+
+            # Compute error and associated uncertainty 
+            err = mean(abs.(d_mmt .- ref_mmt) ./ ref_mmt)
+            err_vals[j] = err.val
+            err_devs[j] = err.err
+        end
+
+        # Produce plots
+        scatter!(ax2, cav_e, err_vals, label=r, marker=mk)
+        lines!(ax2, cav_e, err_vals)
+        errorbars!(ax2, cav_e, err_vals, err_devs, color=:red)
+
+    end
+
+    fig[1:end,2] = Legend(fig, ax1, L"\sigma_M/\Omega_\mathrm{R}")
     fig
 end
