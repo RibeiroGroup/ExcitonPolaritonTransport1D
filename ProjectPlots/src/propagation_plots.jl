@@ -35,30 +35,3 @@ function ideal_propagation(;Nmvals, Nc, ΩR, a, title=false)
     axislegend(ax1, position=:lt)
     fig
 end
-
-function SI_Nm1000()
-
-    # Plot global settings
-    fontsize_theme = Theme(fontsize = 25)
-    set_theme!(fontsize_theme)
-
-    fig = Figure()
-
-    # Create plot for probability of finding exciton at the systems edge
-    ax1 = Axis(fig[1,1], xlabel="Time (fs)", ylabel="Molecular amplitude\nat the boundaries", ylabelsize=20) 
-    xlims!(ax1, 0, 405)
-    pend = h5read(joinpath(@__DIR__, "../../propagation_study/size_effects/out.h5"), "pend")
-    lines!(ax1, 0:1:400, pend[1:401])
-    vlines!(ax1, [75], linestyle=:dash, color=:black)
-    text!(ax1, 75, 0.03, text="Tails reach\nsystem boundaries", fontsize=15, justification=:center, align=(:center, :top))
-
-    # Create plot for probability of finding photon
-    ax2 = Axis(fig[2,1], xlabel="Time (fs)", ylabel=L"P_\mathrm{phot}")
-    xlims!(ax2, 0, 205)
-    pphot = h5read(joinpath(@__DIR__, "../../propagation_study/size_effects/out.h5"), "pphot")
-    vlines!(ax2, [18.5, 59.5], linestyle=:dot, color=:black)
-    scatter!(ax2, 0:1:200, pphot[1:201], color=:lightgoldenrod2)
-    text!(ax2, 13, 0.18, text=L"T = 41\; \mathrm{fs} \approx \Omega_R^{-1}")
-
-    fig
-end

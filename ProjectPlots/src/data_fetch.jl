@@ -25,3 +25,20 @@ function get_ideal_x2(;Nm::Int, Nc::Int, ΩR, a)
 
     return t0:δt:tf, x2
 end
+
+function max_cavity_energy(;Nm::Int, Nc::Int, a)
+    fname  = "Nm$(Nm)/Nc$(Nc)/R0p05/a$a/Em2p0_sx60/log.out"
+    path = joinpath(@__DIR__,"../../propagation_study/ideal/"*fname)
+
+    max_e = 0.0
+    open(path) do io
+        m = match(r"Maximum Cavity energy:\s+?(\d+?\.\d+)", read(io, String))
+        if isnothing(m)
+            println("Couldn't read 'Maximum Cavity energy' from the output file at Nm=$Nm, Nc=$Nc, ΩR=$ΩRm, a=$a")
+        else
+            max_e = parse(Float64, m.captures[1])
+        end
+    end
+
+    return max_e
+end
