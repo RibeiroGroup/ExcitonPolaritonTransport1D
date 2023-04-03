@@ -13,7 +13,7 @@ output(Dates.format(now(), "U, dd yyyy - HH:MM:SS"))
 path = joinpath(@__DIR__, "out.h5")
 
 # Total number of realizations 
-NR_T = 40
+NR_T = 100
 
 # Wavepacket initial spread values
 σxvals = [60, 120, 180]
