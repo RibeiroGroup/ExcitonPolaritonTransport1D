@@ -91,8 +91,8 @@ for σi = 1:3
 
         r = 1:NofR
         
-        h5write(path, "NR_$(NofR)_sm$(σx)_avg_mode_weight", [mean(mol_amplitudes[i,σi,r]) for i = eachindex(tvals)])
-        h5write(path, "NR_$(NofR)_sm$(σx)_std_mode_weight", [std(mol_amplitudes[i,σi,r]) for i = eachindex(tvals)])
+        h5write(path, "NR_$(NofR)_sm$(σx)_avg_d", [mean(mol_amplitudes[i,σi,r]) for i = eachindex(tvals)])
+        h5write(path, "NR_$(NofR)_sm$(σx)_std_d", [std(mol_amplitudes[i,σi,r]) for i = eachindex(tvals)])
     end
 end
 output("Done.")
