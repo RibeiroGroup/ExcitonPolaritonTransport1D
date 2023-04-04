@@ -52,6 +52,60 @@ No disorder.
 fig3() = ideal_error()
 
 """
+(a) Propagation under disorder for σM = 0.02 eV and several Nc vals.
+(b) Propagation under disorder for σM = 0.05 eV and several Nc vals.
+Band plot is the reference trajectory (Nc=1601)
+(c) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
+for several values of disorder.
+Error computed over 1 ps of simulation.
+Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
+Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
+"""
+function fig4()
+
+    # Plot global settings
+    fontsize_theme = Theme(fontsize = 23, palette=(color=cgrad(:Dark2_7),))
+    set_theme!(fontsize_theme)
+
+    # Create figure object
+    fig = Figure()
+
+    # Create axis for error plot
+    ax1 = Axis(fig[2:4,3:4], xlabel="Cavity energy cutoff (eV)", ylabel="Error", xticks=2:0.1:2.4)
+    ylims!(-0.01, 0.85)
+    xlims!(1.995, 2.48)
+
+    # Plot error
+    plot_dis_error!(ax1)
+
+    # Create axis for propagation plots
+    ax2 = Axis(fig[1:2,1:2], xticks=[0,300,600,900], yticks=0:100:300, xticklabelsvisible=false)
+    ax3 = Axis(fig[3:4,1:2], xticks=[0,300,600,900], yticks=0:100:300, xlabel="Time (fs)")
+    Label(fig[1:4,0], L"d = \sqrt{\left \langle x^2 \right \rangle} / a", rotation=π/2)
+    linkaxes!(ax2, ax3)
+    xlims!(ax3, 0, 1000)
+    ylims!(ax3, 0, 350)
+
+    # Plot propagations
+    plot_dis_propagation!(ax2, σM=0.02, Ncvals=[0, 10, 75, 100, 200, 400])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
+    plot_dis_propagation!(ax3, σM=0.05, Ncvals=[0, 10, 75, 100, 200, 400])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
+
+    # Legend for the propagation plots
+    fig[1,3] = Legend(fig, ax2, L"N_c", nbanks=2)
+    fig[1,4] = Legend(fig, ax1, L"\sigma_M/\Omega_R", nbanks=2)
+
+    # Add plot label (a, b, c)
+    for (l, ax) in zip(("(a)", "(b)", "(c)"), [ax2, ax3, ax1])
+        text!(ax, 0.05, 0.99, text=l, space=:relative, align=(:left, :top), font=:bold)
+    end
+    text!(ax2, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.2", space=:relative, align=(:right, :bottom), font=:bold)
+    text!(ax3, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.5", space=:relative, align=(:right, :bottom), font=:bold)
+
+    trim!(fig.layout)
+    fig
+end
+
+"""
 Upper panel: Exciton amplitude at the system boundaries (first and final 100 molecules) as a function of time.
 Lower panel: Long time (up to 30 ps) wavepacket width (d) for several system sizes (Nm).
 Nm = 1000, Nc = 1601, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm.

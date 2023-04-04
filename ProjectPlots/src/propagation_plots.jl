@@ -1,7 +1,7 @@
 function ideal_propagation(;Nmvals, Nc, ΩR, a, title=false)
 
     # Plot global settings
-    fontsize_theme = Theme(fontsize = 20)
+    fontsize_theme = Theme(fontsize = 23, palette=(color=cgrad(:Dark2_7),))
     set_theme!(fontsize_theme)
 
     fig = Figure()
