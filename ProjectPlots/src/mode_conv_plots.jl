@@ -247,7 +247,6 @@ function plot_dis_error(;NR = 100, σx = 60, Ncvals=[0, 1, 5, 10, 20, 35, 50, 75
 
     fig
 end
-    
 
 function plot_dis_error!(ax::Axis; ΩR=0.1, NR = 100, σx = 60, Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100], tmax=1000)
 

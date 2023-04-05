@@ -35,3 +35,35 @@ function ideal_propagation(;Nmvals, Nc, ΩR, a, title=false)
     axislegend(ax1, position=:lt)
     fig
 end
+
+function dis_propagation(;ΩR=0.1, σx=120, σMvals=[0.005, 0.01, 0.02, 0.04], xl=(0,2500), yl=(0,1100))
+
+	fontsize_theme = Theme(fontsize = 25)
+    set_theme!(fontsize_theme)
+	
+    fig = Figure()
+    ax = Axis(fig[1,1], xlabel="Time (fs)", ylabel=L"d = \sqrt{\left \langle x^2 \right \rangle} / a", ylabelsize=30, xticks=0:500:2500)
+
+    for σM in σMvals
+        dis_propagation!(ax, ΩR=ΩR, σx=σx, σM=σM)
+    end
+
+	xlims!(ax, xl...)
+	ylims!(ax, yl...)
+    axislegend(ax, ax, L"\sigma_M / \Omega_R", nbanks=2, position=:lt)#, orientation=:horizontal)
+    fig
+end
+
+function dis_propagation!(ax::Axis; ΩR=0.1, σx=120, σM=0.005)	    
+    
+	Rstr = replace(string(ΩR), "." => "p") 
+    sm = replace(string(σM), "." => "p") 
+
+    path = joinpath(@__DIR__, "../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+
+    d = h5read(path, "$(Int(σx))_avg_d")
+	tvals = h5read(path, "d_tvals") .* 1000
+
+    lsty = σM ≥ ΩR ? :dash : :solid  
+    lines!(ax, tvals, d, linewidth=3.0, linestyle=lsty, label=L"%$(σM)")
+end

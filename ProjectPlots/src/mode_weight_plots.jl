@@ -2,249 +2,203 @@ using Makie
 using WGLMakie
 using Statistics
 using HDF5
-using LinearRegression
 using LaTeXStrings
 using Measurements
 
-function plot_mw2(σx)
+"""
+    Produces a graph with two columns and several plots of the mode weight at different detunings
+"""
+function plot_ideal_mw(;δvals=[0.1, 0.0, -0.1, -0.2], σx=120, Em=2.0, zeroq=true)
 
     # Plot global settings
     fontsize_theme = Theme(fontsize = 20)
     set_theme!(fontsize_theme)
 
-    Rvals = ["R0p05", "R0p1", "R0p2", "R0p3"]
-    Emvals = ["Em1p9", "Em2p0", "Em2p1", "Em2p2"]
-    NRvals = [0.05, 0.1, 0.2, 0.3]
+    δvals = reshape(δvals, length(δvals)÷2, 2)
 
     fig = Figure()
-    #ax1p8 = Axis(fig[1,1], xlabel="Mode Energy (eV)", title=L"\delta = 0.2\; \mathrm{eV}", xticks=[2, 2.2, 2.4])
-    ax1p9 = Axis(fig[1,1], xlabel="Mode Energy (eV)", ylabel="Relative mean prob.", title=L"\delta = 0.1\; \mathrm{eV}", xticks=[2, 2.2, 2.4],xminorticksvisible=true)
-    ax2p0 = Axis(fig[1,2], xlabel="Mode Energy (eV)", ylabel="Relative mean prob.", title=L"\delta = 0.0\; \mathrm{eV}", xticks=[2, 2.2, 2.4],xminorticksvisible=true)
-    ax2p1 = Axis(fig[2,1], xlabel="Mode Energy (eV)", ylabel="Relative mean prob.", title=L"\delta = -0.1\;\mathrm{eV}", xticks=[2, 2.2, 2.4],xminorticksvisible=true)
-    ax2p2 = Axis(fig[2,2], xlabel="Mode Energy (eV)", ylabel="Relative mean prob.", title=L"\delta = -0.2\;\mathrm{eV}", xticks=[2, 2.2, 2.4],xminorticksvisible=true)
-    axs = [ax1p9, ax2p0, ax2p1, ax2p2]
+    axs = [Axis(fig[i,j], title=L"\delta = %$(δvals[i,j])\; \mathrm{eV}", xticks=2:0.1:2.4, xticklabelsvisible=(i==2),
+    yticklabelsvisible=(j==1)) for i = axes(δvals, 1), j = axes(δvals, 2)]
 
-    (x-> xlims!(x, 2.0, 2.5)).(axs)
-    e = h5read(joinpath(@__DIR__, "cavity.h5"), "e")
-
-    i = 0
-    for R in Rvals
-        i += 1
-        NR = NRvals[i]
-        for k in eachindex(axs)
-            E = Emvals[k]
-            dist = h5read(joinpath(@__DIR__,"zero_exc_momentum/$E/$R/out.h5"), "$(σx)_phot_weight")
-            lines!(axs[k], e, dist, label=L"\Omega_R = %$(NRvals[i]) \; \mathrm{eV}", linewidth=2.5)
-        end
+    for (ax, δ) in zip(axs, δvals)
+        plot_ideal_mw!(ax, σx=σx, Em=Em-δ, zeroq=zeroq)
+        xlims!(ax, 2, 2.5)
     end
 
-    fig[3,1:2] = Legend(fig, ax2p0, orientation=:horizontal)
+    Label(fig[1:end,0], "Relative Weight", rotation=π/2)
+    Label(fig[end+1,1:end], "Mode energy (eV)")
+
+    #fig[end+1, 1:end] = Legend(fig[end+1, 1:end], axs[1], L"\Omega_R\;\mathrm{(eV)}", orientation=:horizontal)
+    axislegend(axs[1], axs[1], L"\Omega_R\;\mathrm{(eV)}")
 
     fig
 end
 
-function plot_mw_NZ(σx)
+function plot_ideal_mw!(ax::Axis; σx=120, Em=2.0, zeroq=true)
 
-    # Plot global settings
-    fontsize_theme = Theme(fontsize = 20)
-    set_theme!(fontsize_theme)
-
-    Rvals = ["R0p05", "R0p1", "R0p2", "R0p3"]
-    Emvals = ["Em1p9", "Em2p0", "Em2p1", "Em2p2"]
-    NRvals = [0.05, 0.1, 0.2, 0.3]
-
-    fig = Figure()
-    #ax1p8 = Axis(fig[1,1], xlabel="Mode Energy (eV)", title=L"\delta = 0.2\; \mathrm{eV}", xticks=[2, 2.2, 2.4])
-    ax1p9 = Axis(fig[1,1], xlabel="Mode Energy (eV)", ylabel="Relative mean prob.", title=L"\delta = 0.1\; \mathrm{eV}", xticks=[2, 2.2, 2.4],xminorticksvisible=true)
-    ax2p0 = Axis(fig[1,2], xlabel="Mode Energy (eV)", ylabel="Relative mean prob.", title=L"\delta = 0.0\; \mathrm{eV}", xticks=[2, 2.2, 2.4],xminorticksvisible=true)
-    ax2p1 = Axis(fig[2,1], xlabel="Mode Energy (eV)", ylabel="Relative mean prob.", title=L"\delta = -0.1\;\mathrm{eV}", xticks=[2, 2.2, 2.4],xminorticksvisible=true)
-    ax2p2 = Axis(fig[2,2], xlabel="Mode Energy (eV)", ylabel="Relative mean prob.", title=L"\delta = -0.2\;\mathrm{eV}", xticks=[2, 2.2, 2.4],xminorticksvisible=true)
-    axs = [ax1p9, ax2p0, ax2p1, ax2p2]
-
-    (x-> xlims!(x, 2.0, 3.0)).(axs)
-    e = h5read(joinpath(@__DIR__, "cavity.h5"), "e")
+    e = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "e")
 
     even = [i%2 == 0 for i = eachindex(e)]
     odd = even .== false
-    clrs = Makie.wong_colors()[1:4]
 
-    i = 0
-    for R in Rvals
+    mstr = zeroq ? "zero" : "nonzero"
+
+    i = 1
+    for ΩR in [0.05, 0.1, 0.2, 0.3]
+        Rstr = "R" * replace(string(ΩR), "."=>"p")
+        Estr = "Em" * replace(string(Em), "."=>"p")
+        mw = h5read(joinpath(@__DIR__,"../../mode_weight/$(mstr)_exc_momentum/$Estr/$Rstr/out.h5"), "$(σx)_phot_weight")
+        lines!(ax, e[even], mw[even], label=L"%$(ΩR)", linewidth=2.5, color=Cycled(i))
+        lines!(ax, e[odd], mw[odd], linestyle=:dash, linewidth=2.5, color=Cycled(i))
         i += 1
-        NR = NRvals[i]
-        for k in eachindex(axs)
-            E = Emvals[k]
-            dist = h5read(joinpath(@__DIR__,"nonzero_exc_momentum/$E/$R/out.h5"), "$(σx)_phot_weight")
-            lines!(axs[k], e[even], dist[even], label=L"\Omega_R = %$(NRvals[i]) \; \mathrm{eV}", linewidth=2.5, color=clrs[i])
-            lines!(axs[k], e[odd], dist[odd], linewidth=2.5, linestyle=:dash, color=clrs[i])
-        end
     end
-
-    fig[3,1:2] = Legend(fig, ax2p0, orientation=:horizontal)
-
-    fig
 end
 
-
-function plot_dis_mw(;σx, δ, ΩR, early=false)
+function barplot_dis_mw(;σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=false, zeroq=true, Δω=0.02)
 
     # Plot global settings
     fontsize_theme = Theme(fontsize = 20)
     set_theme!(fontsize_theme)
 
-    σxvals = [0.005, 0.02, 0.05, 0.1]
-    # Create figure and axes
-    titles = ["(a)" "(e)"; "(b)" "(f)"; "(c)" "(g)"; "(d)" "(h)"]
     fig = Figure()
-    axs = [Axis(fig[i,j], xticklabelsvisible= i == 4 ? true : false, 
-    yticklabelsvisible= j == 1 ? true : false,  xticks = 2:0.1:2.5) for i = 1:4, j = 1:2]
+    ax = Axis(fig[1,1], xlabel="Mode Energy (eV)", ylabel="Average Relative Weight")
+    xlims!(ax, 2, 2.55)
 
-    for ax in axs
-        xlims!(ax, 2, 2.55)
-    end
+    plot_dis_mw!(ax, σx=σx, σM=σM, Em=Em, ΩR=ΩR, early=early, zeroq=zeroq, Δω=Δω)
+    axislegend(ax)
 
-    for i = 1:4
-        linkyaxes!(axs[i,1], axs[i,2])
-    end
+    fig
+end
 
-    Label(fig[0,1], L"\bar{q}_0 = 0", justification=:center, tellwidth=false, lineheight=0.8)
-    Label(fig[0,2], L"\bar{q}_0 \neq 0", justification=:center, tellwidth=false, lineheight=0.8)
-    Label(fig[1:end,0], "Relative average weight", justification=:center, rotation=pi/2)
-    Label(fig[5,1:2], "Mode energy (eV)", justification=:center)
+function barplot_dis_mw!(ax::Axis; σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=false, zeroq=true, Δω=0.02)
 
     # Translate numerical δ and ΩR to a string, for file handling 
-    Emstr = "Em" * replace(string(2 - δ), '.'=>'p')
+    Emstr = "Em" * replace(string(Em), '.'=>'p')
     Rstr = "R" * replace(string(ΩR), '.'=>'p')
 
-    cav_e = h5read(joinpath(@__DIR__, "cavity.h5"), "e")
+    cav_e = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "e")
 
     ER = early ? "EARLY_" : ""
 
     even = [i%2 == 0 for i = eachindex(cav_e)]
     odd = even .== false
 
-    upbounds = 2.02:0.02:3.5
+    # Upbound hold the maximum (exclusive) mode energy grouped in each bar
+    upbounds = (2 + Δω):Δω:3.5
 
+    σMstr = "sm" * replace(string(σM), '.'=>'p')
+    path = joinpath(@__DIR__, "../../mode_weight/disorder/$Emstr/$Rstr/$σMstr/out.h5")
+
+    # Arrays to hold the sum of weights for each bar
     mw_even = zeros(Measurement, length(upbounds))
-    mw_odd = zeros(Measurement, length(upbounds))
+    mw_odd = zeros(Measurement, length(upbounds))           
 
-    for (i,σM) in enumerate([0.005, 0.02,  0.05, 0.1])
-        σMstr = "sm" * replace(string(σM), '.'=>'p')
+    q = zeroq ? "" : "nzq_"
+    avg_mw = h5read(path, "$(ER)$(q)$(σx)_avg_mode_weight")
+    std_mw = h5read(path, "$(ER)$(q)$(σx)_std_mode_weight")
 
-        for (j, q) in enumerate(["", "nzq_"])
+    # Use twice the standard deviation as error bars
+    mw = [measurement(avg_mw[i], 2 .* std_mw[i]) for i = eachindex(avg_mw)]
 
-            mw_even .= 0
-            mw_odd .= 0
-
-            avg_mw = h5read(joinpath(@__DIR__, "disorder/$Emstr/$Rstr/$σMstr/out.h5"), "$(ER)$(q)$(σx)_avg_mode_weight")
-            std_mw = h5read(joinpath(@__DIR__, "disorder/$Emstr/$Rstr/$σMstr/out.h5"), "$(ER)$(q)$(σx)_std_mode_weight")
-
-            mw = [measurement(avg_mw[i], 2 .* std_mw[i]) for i = eachindex(avg_mw)]
-
-            k = 1
-            for u in eachindex(upbounds)
-                while cav_e[even][k] < upbounds[u]
-                    mw_even[u] += mw[even][k]
-                    k += 1
-                    if k > length(cav_e[even])
-                        break
-                    end
-                end
+    # Loop thorugh even mode weights
+    k = 1
+    for u in eachindex(upbounds)
+        # If the energy of that mode is below the u-th upbound, add to the corresponding bar
+        while cav_e[even][k] < upbounds[u]
+            mw_even[u] += mw[even][k]
+            k += 1
+            # Since we are using an explicit iterator (k)
+            # Add a break statement to prevent from going being the array length
+            if k > length(cav_e[even])
+                break
             end
-            k = 1
-            for u in eachindex(upbounds)
-                while cav_e[odd][k] < upbounds[u]
-                    mw_odd[u] += mw[odd][k]
-                    k += 1
-                    if k > length(cav_e[even])
-                        break
-                    end
-                end
+        end
+        # Once we go over the u-th ceiling, iterate to the next bar
+    end
+
+    # Repeat process for odd modes
+    k = 1
+    for u in eachindex(upbounds)
+        while cav_e[odd][k] < upbounds[u]
+            mw_odd[u] += mw[odd][k]
+            k += 1
+            if k > length(cav_e[even])
+                break
             end
-
-            mw_even = mw_even ./ maximum(mw_even)
-            mw_odd = mw_odd ./ maximum(mw_odd)
-
-            vals_even = [x.val for x = mw_even]
-            vals_odd  = [x.val for x = mw_odd]
-            err_even = [x.err for x = mw_even]
-            err_odd  = [x.err for x = mw_odd]
-
-            barplot!(axs[i,j], upbounds, vals_even)
-            barplot!(axs[i,j], upbounds, vals_odd)
-	        errorbars!(axs[i,j], upbounds, vals_even, err_even, color = :red4, whiskerwidth = 10)
-
-            vlines!(axs[i,j], [2 - δ], color = :red, linestyle=:dash)
-            if q == "nzq_"
-                vlines!(axs[i,j], [2.1], color = :blue, linestyle=:dash)
-            end
-
-            text!(axs[i,j], 0.95, 0.95, text=titles[i,j], align=(:right, :top), space=:relative, font=:bold)
-            text!(axs[i,j], 0.99, 0.65, text=L"{\sigma_M}/{\Omega_R} = %$(10*σM)", align=(:right, :top), space=:relative, fontsize=18)
         end
     end
 
-    fig
+    # Normalized using the max bar
+    N = max(maximum(mw_even), maximum(mw_odd))
+
+    mw_even = mw_even ./ N
+    mw_odd = mw_odd ./ N
+
+    vals_even = [x.val for x = mw_even]
+    vals_odd  = [x.val for x = mw_odd]
+    err_even = [x.err for x = mw_even]
+    err_odd  = [x.err for x = mw_odd]
+
+    barplot!(ax, upbounds, vals_even, label=L"q\;>\;0")
+    barplot!(ax, upbounds, vals_odd, label=L"q \leq 0")
+    #scatter!(ax, cav_e[even], avg_mw[even], label=L"q\;>\;0")
+    #errorbars!(ax, cav_e[even], avg_mw[even], std_mw[even])
+	errorbars!(ax, upbounds, vals_even, err_even, color = :red4, whiskerwidth = 10)
+	errorbars!(ax, upbounds, vals_odd, err_odd, color = :red4, whiskerwidth = 10)
 end
 
-function plot_mw(;δ)
+function plot_dis_mw(;σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=false, zeroq=true)
 
     # Plot global settings
     fontsize_theme = Theme(fontsize = 20)
     set_theme!(fontsize_theme)
 
-    # Create figure and axes
-    titles = ["(a)" "(e)"; "(b)" "(f)"; "(c)" "(g)"; "(d)" "(h)"]
     fig = Figure()
-    axs = [Axis(fig[i,j], xticklabelsvisible= i == 3 ? true : false, 
-    yticklabelsvisible= j == 1 ? true : false,  xticks = 2:0.1:2.5) for i = 1:3, j = 1:2]
+    ax = Axis(fig[1,1], xlabel="Mode Energy (eV)", ylabel="Average Relative Weight")
+    xlims!(ax, 2, 2.55)
 
-    for ax in axs
-        xlims!(ax, 2, 2.55)
-    end
+    plot_dis_mw!(ax, σx=σx, σM=σM, Em=Em, ΩR=ΩR, early=early, zeroq=zeroq, Δω=Δω)
+    axislegend(ax)
 
-    Label(fig[0,1], L"\bar{q}_0 = 0", justification=:center, tellwidth=false, lineheight=0.8)
-    Label(fig[0,2], L"\bar{q}_0 \neq 0", justification=:center, tellwidth=false, lineheight=0.8)
-    Label(fig[1:end,0], "Relative average weight", justification=:center, rotation=pi/2)
-    Label(fig[4,1:2], "Mode energy (eV)", justification=:center)
+    fig
+end
+
+function plot_dis_mw!(ax::Axis;σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=false, zeroq=true)
 
     # Translate numerical δ and ΩR to a string, for file handling 
-    Emstr = "Em" * replace(string(2.0 - δ), '.'=>'p')
+    Emstr = "Em" * replace(string(Em), '.'=>'p')
+    Rstr = "R" * replace(string(ΩR), '.'=>'p')
 
-    cav_e = h5read(joinpath(@__DIR__, "cavity.h5"), "e")
+    cav_e = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "e")
+
+    ER = early ? "EARLY_" : ""
 
     even = [i%2 == 0 for i = eachindex(cav_e)]
     odd = even .== false
 
-    for (i,σx) in enumerate([60, 120, 180])
+    σMstr = "sm" * replace(string(σM), '.'=>'p')
+    path = joinpath(@__DIR__, "../../mode_weight/disorder/$Emstr/$Rstr/$σMstr/out.h5")
 
-        for (j, q) in enumerate(["", "non"])
+    q = zeroq ? "" : "nzq_"
+    avg_mw = h5read(path, "$(ER)$(q)$(σx)_avg_mode_weight")
+    std_mw = h5read(path, "$(ER)$(q)$(σx)_std_mode_weight")
 
-            for (k,ΩR) in enumerate([0.05, 0.1, 0.2, 0.3])
+    # Use twice the standard deviation as error bars
+    mw = [measurement(avg_mw[i], 2 .* std_mw[i]) for i = eachindex(avg_mw)]
+    mw_even = mw[even]
+    mw_odd = mw[odd]
 
-                Rstr = "R" * replace(string(ΩR), '.'=>'p')
+    # Normalized using the maximum weight
+    mw_even = mw_even ./ maximum(avg_mw)
+    mw_odd = mw_odd ./ maximum(avg_mw)
 
-                mw = h5read(joinpath(@__DIR__,"$(q)zero_exc_momentum/$Emstr/$Rstr/out.h5"), "$(σx)_phot_weight")
-                #lines!(axs[i,j], cav_e[even], mw[even], label=L"\Omega_R = %$(ΩR) \; \mathrm{eV}", linewidth=2.5)
+    vals_even = [x.val for x = mw_even]
+    vals_odd  = [x.val for x = mw_odd]
+    err_even = [x.err for x = mw_even]
+    err_odd  = [x.err for x = mw_odd]
 
-                if q == ""
-                    lines!(axs[i,j], cav_e, mw, label=L"\Omega_R = %$(ΩR) \; \mathrm{eV}", linewidth=2.5)
-                elseif q == "non"
-                    lines!(axs[i,j], cav_e[even], mw[even], label=L"\Omega_R = %$(ΩR) \; \mathrm{eV}", linewidth=2.5)
-                    lines!(axs[i,j], cav_e[odd], mw[odd], linewidth=2.5, linestyle=:dash, color=Cycled(k))
-                end
-
-                vlines!(axs[i,j], [2 - δ], color = :red, linestyle=:dot)
-                if q == "non"
-                    vlines!(axs[i,j], [2.1], color = :blue, linestyle=:dot)
-                end
-            end
-
-            text!(axs[i,j], 0.95, 0.95, text=titles[i,j], align=(:right, :top), space=:relative, font=:bold)
-            text!(axs[i,j], 0.99, 0.7, text=L"\sigma_x / a = %$(Int(σx/10))", align=(:right, :top), space=:relative, fontsize=18)
-        end
-    end
-
-    fig[5,1:2] = Legend(fig, axs[1,1], orientation=:horizontal)
-    fig
+    band!(ax, cav_e[even], vals_even .- err_even, vals_even .+ err_even)
+    scatter!(ax, cav_e[even], vals_even, label=L"q\;>\;0", markersize=8, marker=:rtriangle)
+    band!(ax, cav_e[odd], vals_odd .- err_odd, vals_odd .+ err_odd)
+    scatter!(ax, cav_e[odd], vals_odd, label=L"q\;>\;0", markersize=8, marker=:ltriangle)
 end
