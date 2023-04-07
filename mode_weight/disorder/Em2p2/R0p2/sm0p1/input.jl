@@ -13,7 +13,7 @@ output(Dates.format(now(), "U, dd yyyy - HH:MM:SS"))
 path = joinpath(@__DIR__, "out.h5")
 
 # Total number of realizations 
-NR_T = 50
+NR_T = 100
 
 # Number of cavity modes
 NC = 200
@@ -139,7 +139,7 @@ for σi = 1:3
     h5write(path, "EARLY_nzq_$(σx)_std_mode_weight", [std(EARLY_MW_qnz[i,σi,:]) for i = axes(EARLY_MW_qnz, 1)])
 
     h5write(path, "q0_$(σx)_phot_cont", [mean(phot_cont_q0[i,σi,:]) for i = axes(phot_cont_q0, 1)])
-    h5write(path, "nzq_$(σx)_phot_cont", [std(phot_cont_qnz[i,σi,:]) for i = axes(phot_cont_qnz, 1)])
+    h5write(path, "nzq_$(σx)_phot_cont", [mean(phot_cont_qnz[i,σi,:]) for i = axes(phot_cont_qnz, 1)])
 end
 output("Done.")
 
