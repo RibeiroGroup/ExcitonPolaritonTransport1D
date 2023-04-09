@@ -87,7 +87,7 @@ output("Computing averages...")
 for σi = 1:3
     σx = σxvals[σi]
     # Compute averages for various numbers of realizations
-    for NofR in [20, 40]
+    for NofR in [20, 40, 60, 80, 100]
 
         r = 1:NofR
         

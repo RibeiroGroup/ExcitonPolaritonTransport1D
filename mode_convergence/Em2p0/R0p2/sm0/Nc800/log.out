@@ -1,5 +1,5 @@
 Initilizing Simulation.
-March, 29 2023 - 17:07:55
+April, 09 2023 - 14:00:40
            ---Quantum System Input Parameters---       
 
               # Light-Matter Interaction #             
@@ -37,7 +37,7 @@ Populating off-diagonal... Done.
 BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
 BLAS Number of Threads: 28
 
-Diagonalization started... Done in  702.23295 seconds.
+Diagonalization started... Done in  736.60617 seconds.
 
 
  --- System Summary
@@ -112,4 +112,4 @@ Evolution of molecular states started
 Saving results...
 Done.
 Exiting code sucessfully.
-March, 29 2023 - 17:20:24
+April, 09 2023 - 14:13:41
