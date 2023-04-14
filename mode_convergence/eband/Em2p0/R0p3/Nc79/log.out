@@ -1,0 +1,45 @@
+Initilizing Simulation.
+April, 13 2023 - 20:08:33
+           ---Quantum System Input Parameters---       
+
+              # Light-Matter Interaction #             
+Rabi Frequency (ΩR):                                   0.3 eV
+
+                # Molecular Properties #               
+Number of molecules (Nm):                              5000
+Average intermolecular distance (a):                   10.0 nm
+Intermolecular distance standard deviation (σa):       0.0 nm
+Average molecular excitation energy (ωM):              2.0 eV
+Molecular excitation energy standard deviation (σM):   0.0 eV
+
+                # Cavity/Wire Properties #               
+Number of positive cavity modes (Nc):                  79
+Cavity y dimension size (Ly):                          200 nm
+Cavity z dimension size (Lz):                          400 nm
+y-momentum quantum number (ny):                        1
+z-momentum quantum number (nz):                        1
+Index of refraction squared (ϵ):                       3.0
+
+Length along x (Nm * a) 50000.00000000 nm
+
+ Minimum Cavity energy:    2.0007863989
+ Maximum Cavity energy:    2.2983272945
+
+ # Total System Dimensions: 5159x5159
+Memory required for Hamiltonian Matrix: 0.426 Gb | 425.844 Mb
+
+## Constructing Hamiltonian Matrix
+Allocating memory... Done.
+Populating diagonal... Done.
+Populating off-diagonal... Done.
+
+## Diagonalization
+BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
+BLAS Number of Threads: 28
+
+Diagonalization started... Done in  493.84317 seconds.
+
+
+ --- System Summary
+
+ Molecular Energies (eV)
