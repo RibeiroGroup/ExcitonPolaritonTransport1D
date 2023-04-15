@@ -75,6 +75,15 @@ function ideal_error(;Nmvals=[5000, 8000, 10000, 15000, 20000], Ncvals=[50, 100,
     ylims!(ax2, (-0.05,0.9))
     linkyaxes!(ax1, ax2)
 
+    ideal_error!(ax1, ax2, Nmvals=Nmvals, Ncvals=Ncvals, Ncref=Ncref, ΩR=ΩR, a=a, tmax=tmax)
+
+    Legend(fig[1:end,2], ax1, L"N_\mathrm{M}") 
+    axislegend(ax2)
+    fig
+end
+
+function ideal_error!(ax1::Axis, ax2::Axis; Nmvals=[5000, 8000, 10000, 15000, 20000], Ncvals=[50, 100, 200, 400, 500], Ncref=800, ΩR=0.1, a=10, tmax::Int=5000)
+
     # Different markers to be used for each Nc value
     mkers = [:circle, :rect, :utriangle, :diamond, :star5, :cross, :xcros, :pentagon]
 
@@ -114,14 +123,74 @@ function ideal_error(;Nmvals=[5000, 8000, 10000, 15000, 20000], Ncvals=[50, 100,
         pretty_table(hcat(Ncvals, cav_e, [round(100*e, digits=2) for e in err_vals]);
         header = ["Nc", "Energy (eV)", "Error"])
     end
-
     lines!(ax2, 2:0.05:3.5, [0.8*exp(-9.5*(e-2)) for e in 2:0.05:3.5], color=:black, linestyle=:dash, label=L"\exp[-\alpha(E_\mathrm{cutoff}-E_\mathrm{min})]")
+end
 
-    Legend(fig[1:end,2], ax1, L"N_\mathrm{M}") 
+function ideal_Ecutoff()
+    fontsize_theme = Theme(fontsize = 25)
+    set_theme!(fontsize_theme)
 
-    axislegend(ax2)
+    # Create figure object
+    fig = Figure()
+
+    # Create axis into the figure
+    #ax1 = Axis(fig[1,1], xlabel="Number of cavity modes", title="(a)", titlealign = :left)
+    ax = Axis(fig[1,1], xlabel=L"\Omega_R \; \mathrm{(eV)}", titlealign = :left)
+    xlims!(ax, 0, 0.35)
+
+    ideal_Ecutoff!(ax, σx=60, Em=2.0)
+    ideal_Ecutoff!(ax, σx=120, Em=2.0)
+    ideal_Ecutoff!(ax, σx=180, Em=2.0)
+    ideal_Ecutoff!(ax, σx=60, Em=2.2)
+    ideal_Ecutoff!(ax, σx=120, Em=2.2)
+    ideal_Ecutoff!(ax, σx=180, Em=2.2)
+
+    lines!(ax, 0:0.01:0.4, [2.40 + 2*R for R = 0:0.01:0.4], linestyle=:dash, linewidth=3, color=:black, label=L"2.4 + 2\Omega_R")
+    axislegend(ax)
 
     fig
+end
+
+function ideal_Ecutoff!(ax::Axis; σx=120, Em=2.0, maxerror=1)
+    
+    Estr = replace(string(Em), "."=>"p")
+    path = joinpath(@__DIR__, "../../mode_convergence/eband/Em$Estr/")
+    Rvals = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
+    Etgt = zeros(length(Rvals))
+
+    for (i,ΩR) in enumerate(Rvals)
+
+        R = replace(string(ΩR), "."=>"p")
+        ref = h5read(path * "R$R/Nc800/out.h5", "sx$(σx)_d")
+
+        # Preallocate arrays for cavity energies and error values
+        Ncvals = [0, 45, 64, 79, 93, 105, 116, 127, 137, 147, 156, 165, 174, 183, 192, 201] 
+        err_vals = zeros(length(Ncvals))
+        cav_e = zeros(length(Ncvals))
+        for (j,Nc) in enumerate(Ncvals)
+
+            # Fetch data for given Nc
+            d = h5read(path * "R$R/Nc$Nc/out.h5", "sx$(σx)_d")
+            
+            # Read output files to find the maximum cavity energy (i.e. energy cutoff)
+            cav_e[j] = max_cavity_energy(Nm=5000, Nc=Nc, a=10, ideal=false, path=path*"R$R/Nc$Nc/log.out")
+
+            # Compute error w.r.t to reference as the mean of the relative absolute error
+            err_vals[j] = mean(abs.(d .- ref) ./ ref)
+        end
+
+        # Produce scatter and line plots
+        #scatter!(ax, cav_e, err_vals, label=L"%$(ΩR)")
+        idx = findfirst(x -> x < maxerror/100, err_vals)
+        Etgt[i] = cav_e[idx]
+
+        # Print out human readable table
+        println("ΩR = $ΩR - Ecutoff for target accuracy = $(cav_e[idx])")
+        pretty_table(hcat(Ncvals, cav_e, [round(100*e, digits=2) for e in err_vals]);
+        header = ["Nc", "Energy (eV)", "Error"])
+    end
+
+    scatter!(ax, Rvals, Etgt, marker = Em == 2 ? :diamond : :xcross, markersize=20)
 end
 
 function plot_dis_error_and_propagation()
@@ -178,7 +247,7 @@ function plot_dis_propagation(; σM, ΩR=0.1, σx=60, NR=100, Ncvals=[0, 5, 50, 
 
     # Create axis into the figure
     ax = Axis(fig[1,1], xlabel="Time (fs)", ylabel=L"d = \sqrt{\left \langle x^2 \right \rangle} / a")
-    xlims!(ax, 0,1020)
+    xlims!(ax, 0,tmax+20)
 
     # Plot onto axis
     plot_dis_propagation!(ax, σM=σM, ΩR=ΩR, σx=σx, NR=NR, Ncvals=Ncvals, tmax=tmax)
@@ -205,7 +274,7 @@ function plot_dis_propagation!(ax::Axis; σM, ΩR=0.1, σx=60, NR=100, Ncvals=[0
     for Nc in Ncvals
 
         path = joinpath(@__DIR__, "../../mode_convergence/Em2p0/$Rstr/$σMstr/Nc$Nc/out.h5")
-        d = h5read(path, "NR_$(NR)_sm60_avg_d")[slice]
+        d = h5read(path, "NR_$(NR)_sm$(σx)_avg_d")[slice]
         max_cav_e = max_cavity_energy(path=replace(path, "out.h5"=>"log.out"), ideal=false, Nm=5000, Nc=Nc, a=10)
         error = sum(abs.(d - dref) ./ dref) / length(1:tfinal)
         println("Nc = $Nc Error = $error   Ecutoff = $max_cav_e")
@@ -282,7 +351,7 @@ function plot_dis_error!(ax::Axis; ΩR=0.1, NR = 100, σx = 60, Ncvals=[0, 1, 5,
         std_dref = h5read(ref_path, "NR_$(NR)_sm$(σx)_std_d")[slice]
 
         # Create Measurement objects, with the standard deviation representing the error of d
-        ref_mmt = [measurement(dref[i], std_dref[i]) for i = eachindex(dref)]
+        ref_mmt = [measurement(dref[i], 2 .*std_dref[i]) for i = eachindex(dref)]
 
         for (j,Nc) in enumerate(Ncvals)
 

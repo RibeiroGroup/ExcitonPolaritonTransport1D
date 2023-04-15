@@ -179,12 +179,15 @@ function plot_dis_mw!(ax::Axis;σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=false,
     σMstr = "sm" * replace(string(σM), '.'=>'p')
     path = joinpath(@__DIR__, "../../mode_weight/disorder/$Emstr/$Rstr/$σMstr/out.h5")
 
+    maxp = zeroq ? maximum(h5read(path, "q0_$(σx)_phot_cont")) : maximum(h5read(path, "nzq_$(σx)_phot_cont"))
+    println("Maximum photon probability for Em=$Em σx=$σx ΩR=$ΩR σM=$σM =>  $maxp")
+
     q = zeroq ? "" : "nzq_"
     avg_mw = h5read(path, "$(ER)$(q)$(σx)_avg_mode_weight")
     std_mw = h5read(path, "$(ER)$(q)$(σx)_std_mode_weight")
 
     # Use twice the standard deviation as error bars
-    mw = [measurement(avg_mw[i], 2 .* std_mw[i]) for i = eachindex(avg_mw)]
+    mw = [measurement(avg_mw[i], std_mw[i]) for i = eachindex(avg_mw)]
     mw_even = mw[even]
     mw_odd = mw[odd]
 
@@ -197,8 +200,11 @@ function plot_dis_mw!(ax::Axis;σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=false,
     err_even = [x.err for x = mw_even]
     err_odd  = [x.err for x = mw_odd]
 
-    band!(ax, cav_e[even], vals_even .- err_even, vals_even .+ err_even)
-    scatter!(ax, cav_e[even], vals_even, label=L"q\;>\;0", markersize=8, marker=:rtriangle)
-    band!(ax, cav_e[odd], vals_odd .- err_odd, vals_odd .+ err_odd)
-    scatter!(ax, cav_e[odd], vals_odd, label=L"q\;>\;0", markersize=8, marker=:ltriangle)
+    c1 = :royalblue3
+    c2 = :darkgoldenrod
+
+    band!(ax, cav_e[even], vals_even .- err_even, vals_even .+ err_even, transparency=true, color=(c1, 0.5))
+    band!(ax, cav_e[odd], vals_odd .- err_odd, vals_odd .+ err_odd, transparency=true, color=(c2, 0.5))
+    lines!(ax, cav_e[even], vals_even, linewidth=3, color=c1)
+    lines!(ax, cav_e[odd], vals_odd, linewidth=3, color=c2)
 end

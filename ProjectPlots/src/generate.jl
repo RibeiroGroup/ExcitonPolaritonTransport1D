@@ -39,7 +39,76 @@ Nc = 1601, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
 """
-fig2() = ideal_propagation(Nmvals=[1000, 5000, 10000, 15000, 20000], Nc=800, ΩR=0.1, a=10)
+function fig2()
+
+    # Plot global settings
+    fontsize_theme = Theme(fontsize = 23) 
+    set_theme!(fontsize_theme)
+
+    fig = Figure()
+    ax1 = Axis(fig[1,1], xlabel="Time (fs)", xticks=0:200:900)
+    xlims!(ax1, 0,1000)
+    ylims!(ax1, 0, 800)
+    ax2 = Axis(fig[2,1], xlabel="Time (ps)", xticks = 0:5:50)
+    xlims!(ax2, 0,15)
+    Label(fig[1:end,0], L"d = \sqrt{\left \langle x^2 \right \rangle} / a", rotation=π/2, justification=:center, fontsize=25)
+
+    ideal_propagation!(ax1, ax2, Nmvals=[1000, 5000, 10000, 15000], Nc=800, ΩR=0.1, a=10)
+
+    Legend(fig[end+1,1:2], ax1, L"N_M", orientation=:horizontal, titleposition=:left)
+
+    ax3 = Axis(fig[1:2,2], xlabel="Position (μm)")
+    hideydecorations!(ax3)
+    ylims!(ax3, -3, 3)
+    xlims!(ax3, -6.5, 6.5)
+
+    # Plot wavepackets
+    off = 2
+    c1 = Makie.wong_colors()[1]
+    c2 = Makie.wong_colors()[2]
+    path = joinpath(@__DIR__, "../../wavepackets/")
+    for t in [100, 200, 400]
+
+        # Fetch exciton wavepackets 
+        exc1 = h5read(path * "/Nm1000_Nc800_R0p1_Em2_a10_sx60/out.h5", "$(t)fs_wvp") 
+        exc2 = h5read(path * "/Nm5000_Nc800_R0p1_Em2_a10_sx60/out.h5", "$(t)fs_wvp") 
+
+        # Fetch positions, convert it to μm and shift the zero to the initial wvp position
+        pos1 = h5read(path * "/Nm1000_Nc800_R0p1_Em2_a10_sx60/out.h5", "positions") ./ 1000 .- 5 
+        pos2 = h5read(path * "/Nm5000_Nc800_R0p1_Em2_a10_sx60/out.h5", "positions") ./ 1000 .- 25
+
+        # Compute total molecular probability
+        p1 = round(sum(exc1), digits=2)
+        p2 = round(sum(exc2), digits=2)
+
+        # Find and normalize wave packets using a common factor
+        # Also add offset for plotting purpuses
+        max1 = maximum(exc1)
+        max2 = maximum(exc2)
+        Z = 1.1*max(max1, max2)
+        exc1 = (exc1 ./  Z) .+ off
+        exc2 = (exc2 ./ -Z) .+ off 
+
+        band!(ax3, pos1, off, exc1, color=c1)
+        band!(ax3, pos2, exc2, off, color=c2)
+
+        text!(ax3, -4.5, off+0.8, text = L"t = %$t\;\mathrm{fs}", align = (:left, :top), fontsize=20)
+
+        off -= 2
+    end
+
+    vlines!(ax3, [-5, 5], linewidth=3, linestyle=:dash, color=:gray)
+
+    # Add label to each graph (a,b,c)
+    for (l,ax) in zip(["(a)", "(b)", "(c)"], [ax1, ax2, ax3])
+        text!(ax, 0.1, 1, text=l, align=(:right, :top), space=:relative, font=:bold)
+    end
+
+    # Add arrows on plot (a)
+    arrows!(ax1, [100, 200, 400], [170, 240, 400], [0, 0, 0], [-50, -50, -50])    
+
+    fig
+end
 
 """
 (a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
@@ -49,7 +118,9 @@ Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
 """
-fig3() = ideal_error()
+function fig3() 
+    ideal_error()
+end
 
 """
 (a) Propagation under disorder for σM = 0.02 eV and several Nc vals.
@@ -176,6 +247,8 @@ function fig6()
     set_theme!(fontsize_theme)
 
     ΩRvals = [0.05, 0.1, 0.2]
+    #σMvals = [0.005, 0.02]
+    σMvals = [0.02, 0.05]
 
     fig = Figure()
     axs = [Axis(fig[i,j], yticklabelsvisible=(j==1), xticks=2:0.1:2.4, xticklabelsvisible=(i==length(ΩRvals))) 
@@ -183,7 +256,7 @@ function fig6()
 
     for j = 1:2
         for i = eachindex(ΩRvals)
-            plot_dis_mw!(axs[i,j], ΩR=ΩRvals[i], early=(j==1), zeroq=false,  Em=2.2, σx=120, σM=0.02)
+            plot_dis_mw!(axs[i,j], ΩR=ΩRvals[i], early=false, zeroq=false,  Em=2.2, σx=120, σM=σMvals[j])
             xlims!(axs[i,j], 2, 2.45)
             ylims!(axs[i,j], -0.1, 1.2)
             vlines!(axs[i,j], [2.2], color = :red, linestyle=:dot)
@@ -192,15 +265,15 @@ function fig6()
             text!(axs[i,j], 2.04, 1.0, align=(:center, :center), text="($('`'+i+3*(j-1)))", fontsize=22, font=:bold)
         end
     end
-    axs[1,1].title = "Early (500 fs)"
-    axs[1,2].title = "Late (5000 fs)"
+    axs[1,1].title = L"\sigma_M = %$(σMvals[1])\;\mathrm{eV}"
+    axs[1,2].title = L"\sigma_M = %$(σMvals[2])\;\mathrm{eV}"
 
     Label(fig[end+1, 1:2], "Mode energy (eV)")
     Label(fig[1:end, 0], "Average relative weight", rotation=π/2)
 
     # Manualy creates a legend... a bit convoluted
     mkers = [:rtriangle, :ltriangle]
-    qmarkers = [MarkerElement(color=Makie.wong_colors()[i], marker=mkers[i]) for i=1:2]
+    qmarkers = [LineElement(color=:royalblue3), LineElement(color=:darkgoldenrod)]
     qvals = [L"q \; > \; 0", L"q \leq 0"]
 
     vmarkers = [LineElement(color =:red, linestyle=:dot), LineElement(color=:blue, linestyle=:dot)]
@@ -364,160 +437,4 @@ function fig8()
     fig
 end
 
-"""
-Upper panel: Exciton amplitude at the system boundaries (first and final 100 molecules) as a function of time.
-Lower panel: Long time (up to 30 ps) wavepacket width (d) for several system sizes (Nm).
-Nm = 1000, Nc = 1601, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm.
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-function SI_fig1()
-
-    # Plot global settings
-    fontsize_theme = Theme(fontsize = 25)
-    set_theme!(fontsize_theme)
-
-    fig = Figure()
-
-    # Create plot for probability of finding exciton at the systems edge
-    ax1 = Axis(fig[1,1], xlabel="Time (fs)", ylabel="Molecular amplitude\nat the boundaries", ylabelsize=20) 
-    xlims!(ax1, 0, 405)
-    pend = h5read(joinpath(@__DIR__, "../../propagation_study/size_effects/out.h5"), "pend")
-    lines!(ax1, 0:1:400, pend[1:401])
-    vlines!(ax1, [75], linestyle=:dash, color=:black)
-    text!(ax1, 75, 0.03, text="Tails reach\nsystem boundaries", fontsize=15, justification=:center, align=(:center, :top))
-
-    # Create plot for probability of finding photon
-    ax2 = Axis(fig[2,1], xlabel="Time (fs)", ylabel=L"P_\mathrm{phot}")
-    xlims!(ax2, 0, 205)
-    pphot = h5read(joinpath(@__DIR__, "../../propagation_study/size_effects/out.h5"), "pphot")
-    vlines!(ax2, [18.5, 59.5], linestyle=:dot, color=:black)
-    scatter!(ax2, 0:1:200, pphot[1:201], color=:lightgoldenrod2)
-    text!(ax2, 13, 0.18, text=L"T = 41\; \mathrm{fs} \approx \Omega_R^{-1}")
-
-    fig
-end
-
-"""
-Upper panel: Short time (up to 1 ps) wavepacket width (d) for several system sizes (Nm).
-Lower panel: Long time (up to 30 ps) wavepacket width (d) for several system sizes (Nm).
-Nc = 1601, ΩR = 0.1 eV, a = 20 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig2() = ideal_propagation(Nmvals=[1000, 5000, 10000, 15000, 20000], Nc=800, ΩR=0.1, a=20, title=true)
-
-"""
-Upper panel: Short time (up to 1 ps) wavepacket width (d) for several system sizes (Nm).
-Lower panel: Long time (up to 30 ps) wavepacket width (d) for several system sizes (Nm).
-Nc = 1601, ΩR = 0.2 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig3() = ideal_propagation(Nmvals=[1000, 5000, 10000, 15000, 20000], Nc=800, ΩR=0.2, a=10, title=true)
-
-"""
-Upper panel: Short time (up to 1 ps) wavepacket width (d) for several system sizes (Nm).
-Lower panel: Long time (up to 30 ps) wavepacket width (d) for several system sizes (Nm).
-Nc = 1, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig4() = ideal_propagation(Nmvals=[1000, 5000, 10000, 15000, 20000], Nc=0,   ΩR=0.1, a=10, title=true)
-
-"""
-Upper panel: Short time (up to 1 ps) wavepacket width (d) for several system sizes (Nm).
-Lower panel: Long time (up to 30 ps) wavepacket width (d) for several system sizes (Nm).
-Nc = 201, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig5() = ideal_propagation(Nmvals=[1000, 5000, 10000, 15000, 20000], Nc=100, ΩR=0.1, a=10, title=true)
-
-"""
-Upper panel: Short time (up to 1 ps) wavepacket width (d) for several system sizes (Nm).
-Lower panel: Long time (up to 30 ps) wavepacket width (d) for several system sizes (Nm).
-Nc = 801, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig6() = ideal_propagation(Nmvals=[1000, 5000, 10000, 15000, 20000], Nc=400, ΩR=0.1, a=10, title=true)
-
-"""
-Propagations using various system sizes (Nm) and number of cavity modes (Nc).
-ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig7() = ideal_propagation_conv(ΩR=0.1, a=10)
-
-"""
-Propagations using various system sizes (Nm) and number of cavity modes (Nc).
-ΩR = 0.2 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig8() = ideal_propagation_conv(ΩR=0.2, a=10)
-
-"""
-Propagations using various system sizes (Nm) and number of cavity modes (Nc).
-ΩR = 0.1 eV, a = 20 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig9() = ideal_propagation_conv(ΩR=0.1, a=20)
-
-"""
-(a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
-(b) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
-Error computed over 0.5 ps of simulation.
-Exponential profile shown is the same as in Fig. 3.
-Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig10() = ideal_error(tmax=500)
-
-"""
-(a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
-(b) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
-Error computed over 1 ps of simulation.
-Exponential profile shown is the same as in Fig. 3.
-Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig11() = ideal_error(tmax=1000)
-
-"""
-(a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
-(b) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
-Error computed over 20 ps of simulation.
-Exponential profile shown is the same as in Fig. 3.
-Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig12() = ideal_error(tmax=20000)
-
-"""
-(a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
-(b) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
-Error computed over 5 ps of simulation.
-Exponential profile shown is the same as in Fig. 3.
-Nm = 5000, ΩR = 0.05 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig13() = ideal_error(ΩR=0.05)
-
-"""
-(a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
-(b) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
-Error computed over 5 ps of simulation.
-Exponential profile shown is the same as in Fig. 3.
-Nm = 5000, ΩR = 0.3 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig14() = ideal_error(ΩR=0.3)
+include("generate_SI.jl")
