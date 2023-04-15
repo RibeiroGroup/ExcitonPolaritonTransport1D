@@ -33,8 +33,9 @@ function generate_figures(;path=".", quality=5, SI=false, maxnum=100)
 end
 
 """
-Upper panel: Short time (up to 1 ps) wavepacket width (d) for several system sizes (Nm).
-Lower panel: Long time (up to 30 ps) wavepacket width (d) for several system sizes (Nm).
+(a): Short time (up to 1 ps) wavepacket width (d) for several system sizes (Nm).
+(b): Long time (up to 30 ps) wavepacket width (d) for several system sizes (Nm).
+(c): Wave packet shapes for Nm = 1000 and 5000 over selected time steps.
 Nc = 1601, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
@@ -119,7 +120,57 @@ Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
 """
 function fig3() 
-    ideal_error()
+    # Plot global settings
+    fontsize_theme = Theme(fontsize = 25)
+    set_theme!(fontsize_theme)
+
+    # Create figure object
+    fig = Figure(resolution=(1200, 400))
+
+    # Create axis into the figure
+    ax1 = Axis(fig[1,1], xlabel="Number of cavity modes", ylabel="Error") 
+    ax2 = Axis(fig[1,2], xlabel="Cavity energy cutoff (eV)")
+    ax3 = Axis(fig[1,3], xlabel=L"\Omega_R\;\mathrm{(eV)}", ylabel="Energy cutoff (eV)")
+    
+    # Axis configuration
+    xlims!(ax1, 50, 1050)
+    xlims!(ax2, (2,3.5))
+    ylims!(ax2, (-0.05,0.9))
+    xlims!(ax3, 0, 0.35)
+    linkyaxes!(ax1, ax2)
+
+    ideal_error!(ax1, ax2, Nmvals=[5000, 10000, 15000, 20000], 
+    Ncvals=[50, 100, 200, 400, 500], Ncref=800, ΩR=0.1, a=10, tmax=5000)
+
+    #clrs = [Makie.wong_colors()[1], :darkgreen, :red4, :turquoise, :lime, :firebrick3, :lightblue1, :palegreen, :indianred1]
+    mkrs = [:dtriangle, :utriangle]
+    clrs = [Makie.wong_colors()[1], :darkgreen, :red4]
+    for (i,Em) in enumerate([2.0, 2.2])
+        for (j,σx) in enumerate([60, 120, 180])
+            ideal_Ecutoff!(ax3, σx=σx, Em=Em, m=mkrs[i], c=clrs[j])
+        end
+    end
+    lines!(ax3, 0:0.01:0.4, [2.40 + 2*R for R = 0:0.01:0.4], linestyle=:dot, linewidth=3, color=:black, label=L"2.4 + 2\Omega_R")
+
+    #Legend(fig[1:end,2], ax1, L"N_\mathrm{M}") 
+    #axislegend(ax1, ax1, L"N_M", orientation=:vertical, nbanks=1, titleposition=:left, labelsize=20)
+    Legend(fig[2,1:2], ax1, L"N_M", orientation=:horizontal, nbanks=1, titleposition=:left, labelsize=20,
+    tellwidth=false)
+    axislegend(ax2, labelsize=20)
+    axislegend(ax3, position=:ct)
+
+    group_marker = [MarkerElement(marker = m, color = :black) for m in mkrs]
+    group_color = [PolyElement(color = color, strokecolor = :transparent) for color in clrs]
+
+    Legend(fig[2,3], [group_marker, group_color], [[L"2.0", L"2.2"], [L"60", L"120", L"180"]], orientation=:horizontal,
+    [L"\omega_M\;\mathrm{(eV)}", L"\sigma_x\;\mathrm{(nm)}"], tellheight=false, labelsize=18)
+
+    # Add label to each graph (a,b,c)
+    for (l,ax) in zip(["(a)", "(b)", "(c)"], [ax1, ax2, ax3])
+        text!(ax, 0.15, 1, text=l, align=(:right, :top), space=:relative, font=:bold, fontsize=20)
+    end
+
+    fig
 end
 
 """

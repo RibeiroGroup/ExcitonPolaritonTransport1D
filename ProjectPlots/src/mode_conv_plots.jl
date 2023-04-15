@@ -151,8 +151,8 @@ function ideal_Ecutoff()
     fig
 end
 
-function ideal_Ecutoff!(ax::Axis; σx=120, Em=2.0, maxerror=1)
-    
+function ideal_Ecutoff!(ax::Axis; σx=120, Em=2.0, maxerror=1, m, c)
+
     Estr = replace(string(Em), "."=>"p")
     path = joinpath(@__DIR__, "../../mode_convergence/eband/Em$Estr/")
     Rvals = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
@@ -190,7 +190,7 @@ function ideal_Ecutoff!(ax::Axis; σx=120, Em=2.0, maxerror=1)
         header = ["Nc", "Energy (eV)", "Error"])
     end
 
-    scatter!(ax, Rvals, Etgt, marker = Em == 2 ? :diamond : :xcross, markersize=20)
+    scatter!(ax, Rvals, Etgt, marker=m, color=c, markersize=15)
 end
 
 function plot_dis_error_and_propagation()
