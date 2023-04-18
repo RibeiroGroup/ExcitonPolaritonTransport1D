@@ -54,6 +54,23 @@ function plot_ideal_mw!(ax::Axis; σx=120, Em=2.0, zeroq=true)
     end
 end
 
+function plot_ideal_mw_q!(ax::Axis; σx=120, Em=2.0, zeroq=true)
+
+    e = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "e")
+    w = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "w")
+
+    perm = sortperm(w)
+
+    mstr = zeroq ? "zero" : "nonzero"
+
+    for ΩR in [0.05, 0.1, 0.2, 0.3]
+        Rstr = "R" * replace(string(ΩR), "."=>"p")
+        Estr = "Em" * replace(string(Em), "."=>"p")
+        mw = h5read(joinpath(@__DIR__,"../../mode_weight/$(mstr)_exc_momentum/$Estr/$Rstr/out.h5"), "$(σx)_phot_weight")
+        lines!(ax, w[perm], mw[perm], label=L"%$(ΩR)", linewidth=2.5)
+    end
+end
+
 function barplot_dis_mw(;σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=false, zeroq=true, Δω=0.02)
 
     # Plot global settings

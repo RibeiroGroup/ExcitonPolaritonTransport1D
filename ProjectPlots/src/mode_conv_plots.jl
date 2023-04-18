@@ -256,30 +256,31 @@ function plot_dis_propagation(; σM, ΩR=0.1, σx=60, NR=100, Ncvals=[0, 5, 50, 
     fig
 end
 
-function plot_dis_propagation!(ax::Axis; σM, ΩR=0.1, σx=60, NR=100, Ncvals=[0, 5, 50, 75, 100, 800], tmax=1000)
+function plot_dis_propagation!(ax::Axis; σM, ΩR=0.1, σx=60, NR=100, ωM=2.0, Ncvals=[0, 5, 50, 75, 100, 800], tmax=1000)
 
 
     Rstr = "R" * replace(string(ΩR), "."=>"p")
     σMstr = "sm" * replace(string(σM), '.'=>'p')
+    ωMstr = "Em" * replace(string(ωM), '.'=>'p')
 
     tfinal = tmax ÷ 10 + 1
     slice = 1:tfinal
     tvals = (0:10:5000)[slice]
 
-    ref_path = joinpath(@__DIR__, "../../mode_convergence/Em2p0/$Rstr/$σMstr/Nc800/out.h5")
+    ref_path = joinpath(@__DIR__, "../../mode_convergence/$ωMstr/$Rstr/$σMstr/Nc800/out.h5")
     dref = h5read(ref_path, "NR_$(NR)_sm$(σx)_avg_d")[slice]
     σ = h5read(ref_path, "NR_$(NR)_sm$(σx)_std_d")[slice]
     band!(ax, tvals, dref .- σ, dref .+ σ, color=:ivory3)
 
     for Nc in Ncvals
 
-        path = joinpath(@__DIR__, "../../mode_convergence/Em2p0/$Rstr/$σMstr/Nc$Nc/out.h5")
+        path = joinpath(@__DIR__, "../../mode_convergence/$ωMstr/$Rstr/$σMstr/Nc$Nc/out.h5")
         d = h5read(path, "NR_$(NR)_sm$(σx)_avg_d")[slice]
         max_cav_e = max_cavity_energy(path=replace(path, "out.h5"=>"log.out"), ideal=false, Nm=5000, Nc=Nc, a=10)
         error = sum(abs.(d - dref) ./ dref) / length(1:tfinal)
         println("Nc = $Nc Error = $error   Ecutoff = $max_cav_e")
 
-        lsty = error > 0.05 ? :dot : :solid
+        lsty = error > 0.01 ? :dot : :solid
 
         lines!(ax, tvals, d, label = L"%$(2*Nc+1)", linewidth=3, linestyle=lsty)
 

@@ -114,6 +114,7 @@ end
 """
 (a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
 (b) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
+(c) Ecutoff necessary for an error smaller than 1% as a function of ΩR
 Error computed over 5 ps of simulation.
 Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
@@ -244,7 +245,7 @@ function fig5(;δ=-0.2)
     set_theme!(fontsize_theme)
 
     # Create figure and axes
-    titles = ["(a)" "(e)"; "(b)" "(f)"; "(c)" "(g)"; "(d)" "(h)"]
+    titles = ["(a)" "(d)"; "(b)" "(e)"; "(c)" "(f)"]
     fig = Figure()
     axs = [Axis(fig[i,j], xticklabelsvisible= i == 3 ? true : false, 
     yticklabelsvisible= j == 1 ? true : false,  xticks = 2:0.1:2.5) for i = 1:3, j = 1:2]
@@ -255,12 +256,68 @@ function fig5(;δ=-0.2)
 
     axs[1,1].title = L"\bar{q}_0 = 0"
     axs[1,2].title = L"\bar{q}_0 \neq 0"
-    Label(fig[1:end,0], "Relative weight", justification=:center, rotation=pi/2)
+    Label(fig[1:end,0], "Relative photon mode weight", justification=:center, rotation=pi/2)
     Label(fig[4,1:2], "Mode energy (eV)", justification=:center)
 
     for (j,q0) = enumerate([true, false])
         for (i,σx) in enumerate([60, 120, 180])
             plot_ideal_mw!(axs[i,j], σx=σx, Em=2-δ, zeroq=q0)
+            text!(axs[i,j], 0.95, 0.95, text=titles[i,j], align=(:right, :top), space=:relative, font=:bold)
+            text!(axs[i,j], 0.99, 0.7, text=L"\sigma_x / a = %$(Int(σx/10))", align=(:right, :top), space=:relative, fontsize=20)
+            vlines!(axs[i,j], [2 - δ], color = :red, linestyle=:dot, linewidth=3)
+            if !q0
+                vlines!(axs[i,j], [2.1], color = :blue, linestyle=:dot, linewidth=3)
+            end
+        end
+    end
+
+    # Manualy creates a legend... a bit convoluted
+    Ωmarkers = [LineElement(color=Makie.wong_colors()[i]) for i = 1:4]
+    Ωvals = [L"0.05", L"0.1", L"0.2", L"0.3"]
+
+    qmarkers = [LineElement(color=:black, linestyle=s) for s = [:solid, :dash]]
+    qvals = [L"q \; > \; 0", L"q \leq 0"]
+
+    vmarkers = [LineElement(color =:red, linestyle=:dot, linewidth=3), LineElement(color=:blue, linestyle=:dot, linewidth=3)]
+    vvals = [L"\hbar\omega_q = E_M", L"q = \bar{q}_0"]
+    fig[5,1:2] = Legend(fig, [Ωmarkers, qmarkers, vmarkers], [Ωvals, qvals, vvals], [L"\mathbf{\Omega_R\:\mathrm{(eV)}}", "Momentum", "Resonance"], orientation=:horizontal)
+    fig
+end
+
+function fig5alt(;δ=-0.2)
+
+    # Plot global settings
+    fontsize_theme = Theme(fontsize = 20)
+    set_theme!(fontsize_theme)
+
+    tks = [-0.013194689145077132, -0.011686724671354029, -0.009927432785343747, -0.00804247719318987, -0.005654866776461627, 
+    0.0, 0.005654866776461627, 0.00804247719318987, 0.009927432785343747, 0.011686724671354029, 0.013194689145077132]
+
+    # Create figure and axes
+    titles = ["(a)" "(d)"; "(b)" "(e)"; "(c)" "(f)"]
+    tks = [96, 108, 122, 137, 156, 201, 246, 265, 280, 294, 306]
+
+    fig = Figure()
+    axs = [Axis(fig[i,j]) for i = 1:3, j = 1:2]
+    coaxs = [Axis(fig[i,j], xticks=(tks, string.([2.5, 2.4, 2.3, 2.2, 2.1, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5])), xaxisposition=:top) for i=1:3, j=1:2] 
+
+    for i=1:3, j=1:2
+        axs[i,j].yticklabelsvisible = j == 1 ? true : false
+        axs[i,j].xticklabelsvisible= i == 3 ? true : false
+        coaxs[i,j].yticklabelsvisible = j == 1 ? true : false
+        coaxs[i,j].xticklabelsvisible= i == 3 ? true : false
+        linkaxes!(axs[i,j], coaxs[i,j])
+        xlims!(coaxs[i,j], -0.015, 0.015)
+    end
+
+    axs[1,1].title = L"\bar{q}_0 = 0"
+    axs[1,2].title = L"\bar{q}_0 \neq 0"
+    Label(fig[1:end,0], "Relative mode weight", justification=:center, rotation=pi/2)
+    Label(fig[4,1:2], "Mode energy (eV)", justification=:center)
+
+    for (j,q0) = enumerate([true, false])
+        for (i,σx) in enumerate([60, 120, 180])
+            plot_ideal_mw_q!(axs[i,j], σx=σx, Em=2-δ, zeroq=q0)
             text!(axs[i,j], 0.95, 0.95, text=titles[i,j], align=(:right, :top), space=:relative, font=:bold)
             text!(axs[i,j], 0.99, 0.7, text=L"\sigma_x / a = %$(Int(σx/10))", align=(:right, :top), space=:relative, fontsize=20)
             vlines!(axs[i,j], [2 - δ], color = :red, linestyle=:dot)
@@ -291,15 +348,11 @@ Nm = 5000, a = 10 nm, σx = 120 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 50 Realizations.
 """
-function fig6()
+function fig6(;early=false, zeroq=false, Em=2.2, σx=120, ΩRvals = [0.2, 0.1, 0.05], σMvals = [0.02, 0.05])
 
     # Plot global settings
     fontsize_theme = Theme(fontsize = 20)
     set_theme!(fontsize_theme)
-
-    ΩRvals = [0.05, 0.1, 0.2]
-    #σMvals = [0.005, 0.02]
-    σMvals = [0.02, 0.05]
 
     fig = Figure()
     axs = [Axis(fig[i,j], yticklabelsvisible=(j==1), xticks=2:0.1:2.4, xticklabelsvisible=(i==length(ΩRvals))) 
@@ -307,11 +360,11 @@ function fig6()
 
     for j = 1:2
         for i = eachindex(ΩRvals)
-            plot_dis_mw!(axs[i,j], ΩR=ΩRvals[i], early=false, zeroq=false,  Em=2.2, σx=120, σM=σMvals[j])
+            plot_dis_mw!(axs[i,j], ΩR=ΩRvals[i], early=early, zeroq=zeroq,  Em=Em, σx=σx, σM=σMvals[j])
             xlims!(axs[i,j], 2, 2.45)
             ylims!(axs[i,j], -0.1, 1.2)
-            vlines!(axs[i,j], [2.2], color = :red, linestyle=:dot)
-            vlines!(axs[i,j], [2.1], color = :blue, linestyle=:dot)
+            vlines!(axs[i,j], [Em], color = :red, linestyle=:dot, linewidth=3)
+            vlines!(axs[i,j], [zeroq ? 2.0 : 2.1], color = :blue, linestyle=:dot, linewidth=3)
             text!(axs[i,j], 2.36, 1.0, align=(:center, :center), text=L"\Omega_R = %$(ΩRvals[i])\; \mathrm{eV}", fontsize=22)
             text!(axs[i,j], 2.04, 1.0, align=(:center, :center), text="($('`'+i+3*(j-1)))", fontsize=22, font=:bold)
         end
@@ -320,14 +373,13 @@ function fig6()
     axs[1,2].title = L"\sigma_M = %$(σMvals[2])\;\mathrm{eV}"
 
     Label(fig[end+1, 1:2], "Mode energy (eV)")
-    Label(fig[1:end, 0], "Average relative weight", rotation=π/2)
+    Label(fig[1:end, 0], "Relative photon mode weight", rotation=π/2)
 
     # Manualy creates a legend... a bit convoluted
-    mkers = [:rtriangle, :ltriangle]
-    qmarkers = [LineElement(color=:royalblue3), LineElement(color=:darkgoldenrod)]
+    qmarkers = [LineElement(color=:royalblue3, linewidth=3), LineElement(color=:darkgoldenrod, linewidth=3)]
     qvals = [L"q \; > \; 0", L"q \leq 0"]
 
-    vmarkers = [LineElement(color =:red, linestyle=:dot), LineElement(color=:blue, linestyle=:dot)]
+    vmarkers = [LineElement(color =:red, linestyle=:dot, linewidth=3), LineElement(color=:blue, linestyle=:dot, linewidth=3)]
     vvals = [L"\hbar\omega_q = E_M", L"q = \bar{q}_0"]
     fig[end+1,1:2] = Legend(fig, [qmarkers, vmarkers], [qvals, vvals], ["Momentum", "Resonance"], orientation=:horizontal, titlesize=18)#, titleposition=:left)
     fig
@@ -442,16 +494,16 @@ function fig8()
 	
     fig = Figure()
 
-    ax1 = Axis(fig[1,1], xticks=0:600:2000, title = L"\Omega_R = 0.05\;\mathrm{eV}")
-	xlims!(ax1, 0, 2500)
+    ax1 = Axis(fig[1,1], xticks=500:2000:4500, title = L"\Omega_R = 0.05\;\mathrm{eV}")
+	xlims!(ax1, 0, 5000)
 	ylims!(ax1, 0, 800)
 
     for σM in σMvals
         dis_propagation!(ax1, ΩR=0.05, σx=σx, σM=σM)
     end
 
-    ax2 = Axis(fig[1,2], yticklabelsvisible=false, title = L"\Omega_R = 0.1\;\mathrm{eV}", xticks=0:600:2000)
-	xlims!(ax2, 0, 2500)
+    ax2 = Axis(fig[1,2], yticklabelsvisible=false, title = L"\Omega_R = 0.1\;\mathrm{eV}", xticks=500:2000:4500)
+	xlims!(ax2, 0, 5000)
 	ylims!(ax2, 0, 800)
 
     for σM in σMvals
