@@ -1,3 +1,4 @@
 *.sh
 *test.png
 *article_figures/*
+*.ipynb_*

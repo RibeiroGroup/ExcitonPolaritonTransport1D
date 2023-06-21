@@ -123,7 +123,7 @@ function ideal_error!(ax1::Axis, ax2::Axis; Nmvals=[5000, 8000, 10000, 15000, 20
         pretty_table(hcat(Ncvals, cav_e, [round(100*e, digits=2) for e in err_vals]);
         header = ["Nc", "Energy (eV)", "Error"])
     end
-    lines!(ax2, 2:0.05:3.5, [0.8*exp(-9.5*(e-2)) for e in 2:0.05:3.5], color=:black, linestyle=:dash, label=L"\exp[-\alpha(E_\mathrm{cutoff}-E_\mathrm{min})]")
+    lines!(ax2, 2:0.05:3.5, [0.8*exp(-9.5*(e-2)) for e in 2:0.05:3.5], color=:black, linestyle=:dash, label=L"\exp[-\alpha(E_\mathrm{cutoff}-\hbar\omega_0)]")
 end
 
 function ideal_Ecutoff()
@@ -256,7 +256,7 @@ function plot_dis_propagation(; σM, ΩR=0.1, σx=60, NR=100, Ncvals=[0, 5, 50, 
     fig
 end
 
-function plot_dis_propagation!(ax::Axis; σM, ΩR=0.1, σx=60, NR=100, ωM=2.0, Ncvals=[0, 5, 50, 75, 100, 800], tmax=1000)
+function plot_dis_propagation!(ax::Axis; σM, ΩR=0.1, σx=60, NR=100, ωM=2.0, Ncvals=[0, 5, 50, 75, 100, 800], threshold=0.05, tmax=1000)
 
 
     Rstr = "R" * replace(string(ΩR), "."=>"p")
@@ -280,7 +280,7 @@ function plot_dis_propagation!(ax::Axis; σM, ΩR=0.1, σx=60, NR=100, ωM=2.0, 
         error = sum(abs.(d - dref) ./ dref) / length(1:tfinal)
         println("Nc = $Nc Error = $error   Ecutoff = $max_cav_e")
 
-        lsty = error > 0.01 ? :dot : :solid
+        lsty = error > threshold ? :dot : :solid
 
         lines!(ax, tvals, d, label = L"%$(2*Nc+1)", linewidth=3, linestyle=lsty)
 
@@ -318,7 +318,7 @@ function plot_dis_error(;NR = 100, σx = 60, Ncvals=[0, 1, 5, 10, 20, 35, 50, 75
     fig
 end
 
-function plot_dis_error!(ax::Axis; ΩR=0.1, NR = 100, σx = 60, Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100], tmax=1000)
+function plot_dis_error!(ax::Axis; ΩR=0.1, ωM=2.0, NR = 100, σx = 60, Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100], tmax=1000)
 
     # Preallocate arrays for error values, error deviations and cavity energies
     err_vals = zeros(length(Ncvals))
@@ -337,6 +337,7 @@ function plot_dis_error!(ax::Axis; ΩR=0.1, NR = 100, σx = 60, Ncvals=[0, 1, 5,
     # Loop through Axes and corresponding Rabi splittings 
 
     Rstr = "R" * replace(string(ΩR), "."=>"p")
+    Emstr = "Em" * replace(string(ωM), '.'=>'p')
 
     for i in eachindex(rats)
 
@@ -347,7 +348,7 @@ function plot_dis_error!(ax::Axis; ΩR=0.1, NR = 100, σx = 60, Ncvals=[0, 1, 5,
         σMstr = "sm" * replace(string(σM), '.'=>'p')
 
         # Get data for Nc = 1601V
-        ref_path = joinpath(@__DIR__, "../../mode_convergence/Em2p0/$Rstr/$σMstr/Nc800/out.h5")
+        ref_path = joinpath(@__DIR__, "../../mode_convergence/$Emstr/$Rstr/$σMstr/Nc800/out.h5")
         dref = h5read(ref_path, "NR_$(NR)_sm$(σx)_avg_d")[slice]
         std_dref = h5read(ref_path, "NR_$(NR)_sm$(σx)_std_d")[slice]
 
@@ -357,7 +358,7 @@ function plot_dis_error!(ax::Axis; ΩR=0.1, NR = 100, σx = 60, Ncvals=[0, 1, 5,
         for (j,Nc) in enumerate(Ncvals)
 
             # Path to the output data
-            path = joinpath(@__DIR__,"../../mode_convergence/Em2p0/$Rstr/$σMstr/Nc$Nc/out.h5")
+            path = joinpath(@__DIR__,"../../mode_convergence/$Emstr/$Rstr/$σMstr/Nc$Nc/out.h5")
 
             # Fetch d values along with their standard deviation
             d = h5read(path, "NR_$(NR)_sm$(σx)_avg_d")[slice]
@@ -382,34 +383,10 @@ function plot_dis_error!(ax::Axis; ΩR=0.1, NR = 100, σx = 60, Ncvals=[0, 1, 5,
     end
 
     # Plot no disorder for reference
-    ideal_ref = h5read(joinpath(@__DIR__, "../../mode_convergence/Em2p0/$Rstr/sm0/Nc800/out.h5"), "sx$(σx)_d")
+    ideal_ref = h5read(joinpath(@__DIR__, "../../mode_convergence/$Emstr/$Rstr/sm0/Nc800/out.h5"), "sx$(σx)_d")
     for (j,Nc) in enumerate(Ncvals)
-        d_ideal = h5read(joinpath(@__DIR__, "../../mode_convergence/Em2p0/$Rstr/sm0/Nc$Nc/out.h5"), "sx$(σx)_d")
+        d_ideal = h5read(joinpath(@__DIR__, "../../mode_convergence/$Emstr/$Rstr/sm0/Nc$Nc/out.h5"), "sx$(σx)_d")
         err_vals[j] = mean(abs.(d_ideal .- ideal_ref) ./ ideal_ref)
     end
     lines!(ax, cav_e, err_vals, linestyle=:dot, color=:black, linewidth=3)
-end
-
-function plot_realizations(σM, Nc)
-
-    # Plot global settings
-    fontsize_theme = Theme(fontsize = 20)
-    set_theme!(fontsize_theme)
-
-    fig = Figure()
-    ax = Axis(fig[1,1], xlabel="Time (fs)", ylabel=L"d")#, title = L"N_M = 5000", xticks = 0:100:500, yticks = [100, 300, 500])
-
-    tvals = 0:10:5000 
-
-    σ = h5read(joinpath(@__DIR__, "../../mode_convergence/Em2p0/R0p1/$(σM)/Nc800/out.h5"), "NR_100_sm60_std_mode_weight")
-    d = h5read(joinpath(@__DIR__, "../../mode_convergence/Em2p0/R0p1/$(σM)/Nc800/out.h5"), "NR_100_sm60_avg_mode_weight")
-    band!(ax, tvals, d .- σ, d .+ σ, color=Cycled(5))
-    for NR in [20, 40, 60, 80, 100]
-
-        d = h5read(joinpath(@__DIR__, "../../mode_convergence/Em2p0/R0p1/$(σM)/Nc800/out.h5"), "NR_$(NR)_sm60_avg_mode_weight")
-        lines!(ax, tvals, d, label = L"N_R= %$(NR)")
-    end
-
-    fig[1,2] = Legend(fig, ax)
-    fig
 end

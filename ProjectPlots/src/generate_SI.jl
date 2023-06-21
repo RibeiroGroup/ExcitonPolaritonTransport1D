@@ -14,15 +14,15 @@ function SI_fig1()
     fig = Figure()
 
     # Create plot for probability of finding exciton at the systems edge
-    ax1 = Axis(fig[1,1], xlabel="Time (fs)", ylabel="Molecular amplitude\nat the boundaries", ylabelsize=20) 
-    xlims!(ax1, 0, 405)
-    pend = h5read(joinpath(@__DIR__, "../../propagation_study/size_effects/out.h5"), "pend")
-    lines!(ax1, 0:1:400, pend[1:401])
-    vlines!(ax1, [75], linestyle=:dash, color=:black)
-    text!(ax1, 75, 0.03, text="Tails reach\nsystem boundaries", fontsize=15, justification=:center, align=(:center, :top))
+    #ax1 = Axis(fig[1,1], xlabel="Time (fs)", ylabel="Molecular amplitude\nat the boundaries", ylabelsize=20) 
+    #xlims!(ax1, 0, 405)
+    #pend = h5read(joinpath(@__DIR__, "../../propagation_study/size_effects/out.h5"), "pend")
+    #lines!(ax1, 0:1:400, pend[1:401])
+    #vlines!(ax1, [75], linestyle=:dash, color=:black)
+    #text!(ax1, 75, 0.03, text="Tails reach\nsystem boundaries", fontsize=15, justification=:center, align=(:center, :top))
 
     # Create plot for probability of finding photon
-    ax2 = Axis(fig[2,1], xlabel="Time (fs)", ylabel=L"P_\mathrm{phot}")
+    ax2 = Axis(fig[1,1], xlabel="Time (fs)", ylabel=L"P_\mathrm{phot}")
     xlims!(ax2, 0, 205)
     pphot = h5read(joinpath(@__DIR__, "../../propagation_study/size_effects/out.h5"), "pphot")
     vlines!(ax2, [18.5, 59.5], linestyle=:dot, color=:black)
@@ -78,30 +78,6 @@ No disorder.
 SI_fig6() = ideal_propagation(Nmvals=[1000, 5000, 10000, 15000, 20000], Nc=400, ΩR=0.1, a=10)
 
 """
-Propagations using various system sizes (Nm) and number of cavity modes (Nc).
-ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig7() = ideal_propagation_conv(ΩR=0.1, a=10)
-
-"""
-Propagations using various system sizes (Nm) and number of cavity modes (Nc).
-ΩR = 0.2 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig8() = ideal_propagation_conv(ΩR=0.2, a=10)
-
-"""
-Propagations using various system sizes (Nm) and number of cavity modes (Nc).
-ΩR = 0.1 eV, a = 20 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-No disorder.
-"""
-SI_fig9() = ideal_propagation_conv(ΩR=0.1, a=20)
-
-"""
 (a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
 (b) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
 Error computed over 0.5 ps of simulation.
@@ -110,7 +86,7 @@ Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
 """
-SI_fig10() = ideal_error(tmax=500)
+SI_fig7() = ideal_error(tmax=500)
 
 """
 (a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
@@ -121,7 +97,7 @@ Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
 """
-SI_fig11() = ideal_error(tmax=1000)
+SI_fig8() = ideal_error(tmax=1000)
 
 """
 (a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
@@ -132,7 +108,7 @@ Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
 """
-SI_fig12() = ideal_error(tmax=20000)
+SI_fig9() = ideal_error(tmax=20000)
 
 """
 (a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
@@ -143,7 +119,7 @@ Nm = 5000, ΩR = 0.05 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
 """
-SI_fig13() = ideal_error(ΩR=0.05)
+SI_fig10() = ideal_error(ΩR=0.05)
 
 """
 (a) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Nc
@@ -154,8 +130,7 @@ Nm = 5000, ΩR = 0.3 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
 """
-SI_fig14() = ideal_error(ΩR=0.3)
-
+SI_fig11() = ideal_error(ΩR=0.3)
 
 """
 (a) Propagation under disorder for σM = 0.02 eV and several Nc vals.
@@ -168,159 +143,9 @@ Nm = 5000, ΩR = 0.2 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 CHANGE FROM FIG 4: ΩR + 0.1
 """
-function SI_fig15()
-
-    # Plot global settings
-    fontsize_theme = Theme(fontsize = 23, palette=(color=cgrad(:Dark2_7),))
-    set_theme!(fontsize_theme)
-
-    # Create figure object
-    fig = Figure()
-
-    # Create axis for error plot
-    ax1 = Axis(fig[2:4,3:4], xlabel="Cavity energy cutoff (eV)", ylabel="Error", xticks=2:0.1:2.4)
-    ylims!(-0.01, 0.85)
-    xlims!(1.995, 2.48)
-
-    # Plot error
-    plot_dis_error!(ax1, ΩR=0.2)
-
-    # Create axis for propagation plots
-    ax2 = Axis(fig[1:2,1:2], xticks=[0,300,600,900], yticks=0:100:300, xticklabelsvisible=false)
-    ax3 = Axis(fig[3:4,1:2], xticks=[0,300,600,900], yticks=0:100:300, xlabel="Time (fs)")
-    Label(fig[1:4,0], L"d = \sqrt{\left \langle x^2 \right \rangle} / a", rotation=π/2)
-    linkaxes!(ax2, ax3)
-    xlims!(ax3, 0, 1000)
-    ylims!(ax3, 0, 450)
-
-    # Plot propagations
-    plot_dis_propagation!(ax2, σM=0.04, ΩR=0.2,Ncvals=[0, 10, 75, 100])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
-    plot_dis_propagation!(ax3, σM=0.1, ΩR=0.2,Ncvals=[0, 10, 75, 100])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
-
-    # Legend for the propagation plots
-    fig[1,3] = Legend(fig, ax2, L"N_c", nbanks=2)
-    fig[1,4] = Legend(fig, ax1, L"\sigma_M/\Omega_R", nbanks=2)
-
-    # Add plot label (a, b, c)
-    for (l, ax) in zip(("(a)", "(b)", "(c)"), [ax2, ax3, ax1])
-        text!(ax, 0.05, 0.99, text=l, space=:relative, align=(:left, :top), font=:bold)
-    end
-    text!(ax2, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.2", space=:relative, align=(:right, :bottom), font=:bold)
-    text!(ax3, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.5", space=:relative, align=(:right, :bottom), font=:bold)
-
-    trim!(fig.layout)
-    fig
-end
-
-"""
-(a) Propagation under disorder for σM = 0.02 eV and several Nc vals.
-(b) Propagation under disorder for σM = 0.05 eV and several Nc vals.
-Band plot is the reference trajectory (Nc=1601)
-(c) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
-for several values of disorder.
-Error computed over 1 ps of simulation.
-Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 180 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-CHANGE FROM FIG 4: σx + 120
-"""
-function SI_fig16()
-
-    # Plot global settings
-    fontsize_theme = Theme(fontsize = 23, palette=(color=cgrad(:Dark2_7),))
-    set_theme!(fontsize_theme)
-
-    # Create figure object
-    fig = Figure()
-
-    # Create axis for error plot
-    ax1 = Axis(fig[2:4,3:4], xlabel="Cavity energy cutoff (eV)", ylabel="Error", xticks=2:0.1:2.4)
-    ylims!(-0.01, 0.85)
-    xlims!(1.995, 2.48)
-
-    # Plot error
-    plot_dis_error!(ax1, σx=120)
-
-    # Create axis for propagation plots
-    ax2 = Axis(fig[1:2,1:2], xticks=[0,300,600,900], yticks=0:100:300, xticklabelsvisible=false)
-    ax3 = Axis(fig[3:4,1:2], xticks=[0,300,600,900], yticks=0:100:300, xlabel="Time (fs)")
-    Label(fig[1:4,0], L"d = \sqrt{\left \langle x^2 \right \rangle} / a", rotation=π/2)
-    linkaxes!(ax2, ax3)
-    xlims!(ax3, 0, 1000)
-    ylims!(ax3, 0, 450)
-
-    # Plot propagations
-    plot_dis_propagation!(ax2, σM=0.02, σx=180, Ncvals=[0, 10, 75, 100, 200, 400])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
-    plot_dis_propagation!(ax3, σM=0.05, σx=180, Ncvals=[0, 10, 75, 100, 200, 400])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
-
-    # Legend for the propagation plots
-    fig[1,3] = Legend(fig, ax2, L"N_c", nbanks=2)
-    fig[1,4] = Legend(fig, ax1, L"\sigma_M/\Omega_R", nbanks=2)
-
-    # Add plot label (a, b, c)
-    for (l, ax) in zip(("(a)", "(b)", "(c)"), [ax2, ax3, ax1])
-        text!(ax, 0.05, 0.99, text=l, space=:relative, align=(:left, :top), font=:bold)
-    end
-    text!(ax2, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.2", space=:relative, align=(:right, :bottom), font=:bold)
-    text!(ax3, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.5", space=:relative, align=(:right, :bottom), font=:bold)
-
-    trim!(fig.layout)
-    fig
-end
-
-"""
-(a) Propagation under disorder for σM = 0.02 eV and several Nc vals.
-(b) Propagation under disorder for σM = 0.05 eV and several Nc vals.
-Band plot is the reference trajectory (Nc=1601)
-(c) Error due to cavity modes truncation (w.r.t to Nc = 1601) as a function of Ecutoff
-for several values of disorder.
-Error computed over 1 ps of simulation.
-Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
-Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
-CHANGE FROM FIG 4: ωM + 0.2 eV
-"""
-function SI_fig17()
-
-    # Plot global settings
-    fontsize_theme = Theme(fontsize = 23, palette=(color=cgrad(:Dark2_7),))
-    set_theme!(fontsize_theme)
-
-    # Create figure object
-    fig = Figure()
-
-    # Create axis for error plot
-    ax1 = Axis(fig[2:4,3:4], xlabel="Cavity energy cutoff (eV)", ylabel="Error", xticks=2:0.1:2.4)
-    ylims!(-0.01, 0.85)
-    xlims!(1.995, 2.48)
-
-    # Plot error
-    plot_dis_error!(ax1, σx=120)
-
-    # Create axis for propagation plots
-    ax2 = Axis(fig[1:2,1:2], xticks=[0,300,600,900], yticks=0:100:300, xticklabelsvisible=false)
-    ax3 = Axis(fig[3:4,1:2], xticks=[0,300,600,900], yticks=0:100:300, xlabel="Time (fs)")
-    Label(fig[1:4,0], L"d = \sqrt{\left \langle x^2 \right \rangle} / a", rotation=π/2)
-    linkaxes!(ax2, ax3)
-    xlims!(ax3, 0, 1000)
-    ylims!(ax3, 0, 450)
-
-    # Plot propagations
-    plot_dis_propagation!(ax2, ωM=2.2, σM=0.02, σx=60, Ncvals=[0, 10, 75, 100, 200, 400])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
-    plot_dis_propagation!(ax3, ωM=2.2, σM=0.05, σx=60, Ncvals=[0, 10, 75, 100, 200, 400])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
-
-    # Legend for the propagation plots
-    fig[1,3] = Legend(fig, ax2, L"N_c", nbanks=2)
-    fig[1,4] = Legend(fig, ax1, L"\sigma_M/\Omega_R", nbanks=2)
-
-    # Add plot label (a, b, c)
-    for (l, ax) in zip(("(a)", "(b)", "(c)"), [ax2, ax3, ax1])
-        text!(ax, 0.05, 0.99, text=l, space=:relative, align=(:left, :top), font=:bold)
-    end
-    text!(ax2, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.2", space=:relative, align=(:right, :bottom), font=:bold)
-    text!(ax3, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.5", space=:relative, align=(:right, :bottom), font=:bold)
-
-    trim!(fig.layout)
-    fig
-end
+SI_fig12() = fig4(ΩR=0.2, σM1=0.04, σM2=0.1, TrajNcs=[0, 10, 75, 100], dymax=450)
+SI_fig13() = fig4(σx=180, dymax=450)
+SI_fig14() = fig4(ωM=2.2, dymax=450)
 
 """
 Photon probability over time for various disoder and initial states.
@@ -328,7 +153,7 @@ Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 No disorder.
 """
-function SI_fig18()
+function SI_fig15()
 
     # Plot global settings
     fontsize_theme = Theme(fontsize = 23, palette=(color=cgrad(:Dark2_7),))
@@ -377,7 +202,7 @@ end
 """
 Average photon probability for various σx and \bar{q}_0 as a function of disorder.
 """
-function SI_fig19()
+function SI_fig16()
 
     # Plot global settings
     fontsize_theme = Theme(fontsize = 23, palette=(color=cgrad(:Dark2_7),))
@@ -449,17 +274,14 @@ function SI_fig19()
 end
 
 """
-    fig5 but with different detuning values
+    #fig5 but with different detuning values
 """
-SI_fig20() = fig5(δ=0.2)
-SI_fig21() = fig5(δ=0.1)
-SI_fig22() = fig5(δ=0.0)
-SI_fig23() = fig5(δ=-0.1)
+SI_fig17() = fig5(δ=0.2)
+SI_fig18() = fig5(δ=0.0)
 
-SI_fig24() = fig6(σMvals=[0.005, 0.1])
-SI_fig25() = fig6(early=true)
-SI_fig26() = fig6(zeroq=true)
-SI_fig27() = fig6(zeroq=true, early=true)
-SI_fig28() = fig6(σx=60)
-SI_fig29() = fig6(σx=180)
-SI_fig30() = fig6(Em=2.0)
+SI_fig19() = fig6(σMvals=[0.005, 0.1])
+SI_fig20() = fig6(early=true)
+SI_fig21() = fig6(zeroq=true)
+SI_fig22() = fig6(σx=60)
+SI_fig23() = fig6(σx=180)
+SI_fig24() = fig6(Em=2.0)

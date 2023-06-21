@@ -184,7 +184,8 @@ Error computed over 1 ps of simulation.
 Nm = 5000, ΩR = 0.1 eV, a = 10 nm, ωM = 2.0 eV, σx = 60 nm
 Ly = 200 nm, Lz = 400 nm, Lx = Nm*a, ϵ = 3, nz = ny = 1.
 """
-function fig4()
+function fig4(;σM1=0.02, σM2=0.05, NR=100, ΩR=0.1, ωM=2.0, σx=60, ErrorNcs=[0, 1, 5, 10, 20, 35, 50, 75, 100], 
+    TrajNcs=[0, 10, 75, 100, 200, 400], tmax=1000, dymax=350)
 
     # Plot global settings
     fontsize_theme = Theme(fontsize = 23, palette=(color=cgrad(:Dark2_7),))
@@ -199,19 +200,19 @@ function fig4()
     xlims!(1.995, 2.48)
 
     # Plot error
-    plot_dis_error!(ax1)
+    plot_dis_error!(ax1, ΩR=ΩR, ωM=ωM, NR=NR, σx=σx, Ncvals=ErrorNcs, tmax=tmax)
 
     # Create axis for propagation plots
-    ax2 = Axis(fig[1:2,1:2], xticks=[0,300,600,900], yticks=0:100:300, xticklabelsvisible=false)
-    ax3 = Axis(fig[3:4,1:2], xticks=[0,300,600,900], yticks=0:100:300, xlabel="Time (fs)")
+    ax2 = Axis(fig[1:2,1:2], xticks=WilkinsonTicks(6), yticks=WilkinsonTicks(2), xticklabelsvisible=false)
+    ax3 = Axis(fig[3:4,1:2], xticks=WilkinsonTicks(6), yticks=WilkinsonTicks(2), xlabel="Time (fs)")
     Label(fig[1:4,0], L"d = \sqrt{\left \langle x^2 \right \rangle} / a", rotation=π/2)
     linkaxes!(ax2, ax3)
-    xlims!(ax3, 0, 1000)
-    ylims!(ax3, 0, 350)
+    xlims!(ax3, 0, tmax)
+    ylims!(ax3, 0, dymax)
 
     # Plot propagations
-    plot_dis_propagation!(ax2, σM=0.02, Ncvals=[0, 10, 75, 100, 200, 400])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
-    plot_dis_propagation!(ax3, σM=0.05, Ncvals=[0, 10, 75, 100, 200, 400])#Ncvals=[0, 1, 5, 10, 20, 35, 50, 75, 100, 200, 400, 800])
+    plot_dis_propagation!(ax2, ΩR=ΩR, ωM=ωM,tmax=tmax, NR=NR, σM=σM1, σx=σx, Ncvals=TrajNcs)
+    plot_dis_propagation!(ax3, ΩR=ΩR, ωM=ωM,tmax=tmax, NR=NR, σM=σM2, σx=σx, Ncvals=TrajNcs)
 
     # Legend for the propagation plots
     fig[1,3] = Legend(fig, ax2, L"N_c", nbanks=2)
@@ -221,8 +222,10 @@ function fig4()
     for (l, ax) in zip(("(a)", "(b)", "(c)"), [ax2, ax3, ax1])
         text!(ax, 0.05, 0.99, text=l, space=:relative, align=(:left, :top), font=:bold)
     end
-    text!(ax2, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.2", space=:relative, align=(:right, :bottom), font=:bold)
-    text!(ax3, 0.98, 0.03, text=L"\sigma_M/\Omega_R = 0.5", space=:relative, align=(:right, :bottom), font=:bold)
+    r1 = round(σM1/ΩR, digits=1)
+    r2 = round(σM2/ΩR, digits=1)
+    text!(ax2, 0.98, 0.03, text=L"\sigma_M/\Omega_R = %$r1", space=:relative, align=(:right, :bottom), font=:bold)
+    text!(ax3, 0.98, 0.03, text=L"\sigma_M/\Omega_R = %$r2", space=:relative, align=(:right, :bottom), font=:bold)
 
     trim!(fig.layout)
     fig
