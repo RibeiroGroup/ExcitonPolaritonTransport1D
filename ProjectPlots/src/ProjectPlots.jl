@@ -5,5 +5,6 @@ using WGLMakie
 
 
 include("JPCL/jpcl.jl")
+include("JCP/jcp.jl")
 
 end # module
