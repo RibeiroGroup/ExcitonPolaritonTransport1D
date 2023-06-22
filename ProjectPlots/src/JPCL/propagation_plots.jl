@@ -63,7 +63,7 @@ function dis_propagation!(ax::Axis; ΩR=0.1, σx=120, σM=0.005)
 	Rstr = replace(string(ΩR), "." => "p") 
     sm = replace(string(σM), "." => "p") 
 
-    path = joinpath(@__DIR__, "../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
 
     d = h5read(path, "$(Int(σx))_avg_d")
 	tvals = h5read(path, "d_tvals") .* 1000
@@ -81,7 +81,7 @@ function phot_cont(σx=120, ΩRvals = [0.05, 0.1, 0.2, 0.3], smvals = [0.005, 0.
         Rstr = "R" * replace(string(ΩR), "."=>"p")
         for sm in smvals
             smstr = "sm" * replace(string(sm), '.'=>'p')
-            path = joinpath(@__DIR__, "../../propagation_study/disorder/Nm500_Nc500_a10_1/$Rstr/$smstr/out.h5")
+            path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/$Rstr/$smstr/out.h5")
             zpm = h5read(path, "$(σx)_avg_zpm")
             ppm = h5read(path, "$(σx)_avg_ppm")
             npm = h5read(path, "$(σx)_avg_npm")
@@ -107,7 +107,7 @@ function max_phot_cont(σx=120, ΩRvals = [0.05, 0.1, 0.2, 0.3], smvals = [0.005
         i = 1
         for sm in smvals
             smstr = "sm" * replace(string(sm), '.'=>'p')
-            path = joinpath(@__DIR__, "../../propagation_study/disorder/Nm500_Nc500_a10_1/$Rstr/$smstr/out.h5")
+            path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/$Rstr/$smstr/out.h5")
             zpm = h5read(path, "$(σx)_avg_zpm")
             ppm = h5read(path, "$(σx)_avg_ppm")
             npm = h5read(path, "$(σx)_avg_npm")

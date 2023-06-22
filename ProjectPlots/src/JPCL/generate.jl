@@ -11,7 +11,7 @@ function generate_figures(;path=".", quality=5, SI=false, maxnum=100)
     fstr = SI ? "SI_fig" : "fig"
     i = 1
     while i ≤ maxnum
-        if isdefined(ProjectPlots, Symbol(fstr*"$i"))
+        if isdefined(JPCL, Symbol(fstr*"$i"))
             push!(plot_functions, eval(Symbol(fstr*"$i")))
         elseif i > 1 # Make sure to check for at least fig2
             break
@@ -67,7 +67,7 @@ function fig2()
     off = 2
     c1 = Makie.wong_colors()[1]
     c2 = Makie.wong_colors()[2]
-    path = joinpath(@__DIR__, "../../wavepackets/")
+    path = joinpath(@__DIR__, "../../../wavepackets/")
     for t in [100, 200, 400]
 
         # Fetch exciton wavepackets 
@@ -430,8 +430,8 @@ function fig7()
     
         # Loop through realizations and build an array with wave packets at the same time step but different realizations
         for n = 1:100
-            vals[:,n]  .= h5read(joinpath(@__DIR__, "../../momentum_study/all/$fname/out$n.h5"), "120_wavepacket_bars", (:,ti))
-            pvals[:,n] .= h5read(joinpath(@__DIR__, "../../momentum_study/pos/$fname/out$n.h5"), "120_wavepacket_bars", (:,ti))
+            vals[:,n]  .= h5read(joinpath(@__DIR__, "../../../momentum_study/all/$fname/out$n.h5"), "120_wavepacket_bars", (:,ti))
+            pvals[:,n] .= h5read(joinpath(@__DIR__, "../../../momentum_study/pos/$fname/out$n.h5"), "120_wavepacket_bars", (:,ti))
         end
     
         # Average over realizations

@@ -154,7 +154,7 @@ end
 function ideal_Ecutoff!(ax::Axis; σx=120, Em=2.0, maxerror=1, m, c)
 
     Estr = replace(string(Em), "."=>"p")
-    path = joinpath(@__DIR__, "../../mode_convergence/eband/Em$Estr/")
+    path = joinpath(@__DIR__, "../../../mode_convergence/eband/Em$Estr/")
     Rvals = [0.05, 0.1, 0.15, 0.2, 0.25, 0.3]
     Etgt = zeros(length(Rvals))
 
@@ -267,14 +267,14 @@ function plot_dis_propagation!(ax::Axis; σM, ΩR=0.1, σx=60, NR=100, ωM=2.0, 
     slice = 1:tfinal
     tvals = (0:10:5000)[slice]
 
-    ref_path = joinpath(@__DIR__, "../../mode_convergence/$ωMstr/$Rstr/$σMstr/Nc800/out.h5")
+    ref_path = joinpath(@__DIR__, "../../../mode_convergence/$ωMstr/$Rstr/$σMstr/Nc800/out.h5")
     dref = h5read(ref_path, "NR_$(NR)_sm$(σx)_avg_d")[slice]
     σ = h5read(ref_path, "NR_$(NR)_sm$(σx)_std_d")[slice]
     band!(ax, tvals, dref .- σ, dref .+ σ, color=:ivory3)
 
     for Nc in Ncvals
 
-        path = joinpath(@__DIR__, "../../mode_convergence/$ωMstr/$Rstr/$σMstr/Nc$Nc/out.h5")
+        path = joinpath(@__DIR__, "../../../mode_convergence/$ωMstr/$Rstr/$σMstr/Nc$Nc/out.h5")
         d = h5read(path, "NR_$(NR)_sm$(σx)_avg_d")[slice]
         max_cav_e = max_cavity_energy(path=replace(path, "out.h5"=>"log.out"), ideal=false, Nm=5000, Nc=Nc, a=10)
         error = sum(abs.(d - dref) ./ dref) / length(1:tfinal)
@@ -348,7 +348,7 @@ function plot_dis_error!(ax::Axis; ΩR=0.1, ωM=2.0, NR = 100, σx = 60, Ncvals=
         σMstr = "sm" * replace(string(σM), '.'=>'p')
 
         # Get data for Nc = 1601V
-        ref_path = joinpath(@__DIR__, "../../mode_convergence/$Emstr/$Rstr/$σMstr/Nc800/out.h5")
+        ref_path = joinpath(@__DIR__, "../../../mode_convergence/$Emstr/$Rstr/$σMstr/Nc800/out.h5")
         dref = h5read(ref_path, "NR_$(NR)_sm$(σx)_avg_d")[slice]
         std_dref = h5read(ref_path, "NR_$(NR)_sm$(σx)_std_d")[slice]
 
@@ -358,7 +358,7 @@ function plot_dis_error!(ax::Axis; ΩR=0.1, ωM=2.0, NR = 100, σx = 60, Ncvals=
         for (j,Nc) in enumerate(Ncvals)
 
             # Path to the output data
-            path = joinpath(@__DIR__,"../../mode_convergence/$Emstr/$Rstr/$σMstr/Nc$Nc/out.h5")
+            path = joinpath(@__DIR__,"../../../mode_convergence/$Emstr/$Rstr/$σMstr/Nc$Nc/out.h5")
 
             # Fetch d values along with their standard deviation
             d = h5read(path, "NR_$(NR)_sm$(σx)_avg_d")[slice]
@@ -383,9 +383,9 @@ function plot_dis_error!(ax::Axis; ΩR=0.1, ωM=2.0, NR = 100, σx = 60, Ncvals=
     end
 
     # Plot no disorder for reference
-    ideal_ref = h5read(joinpath(@__DIR__, "../../mode_convergence/$Emstr/$Rstr/sm0/Nc800/out.h5"), "sx$(σx)_d")
+    ideal_ref = h5read(joinpath(@__DIR__, "../../../mode_convergence/$Emstr/$Rstr/sm0/Nc800/out.h5"), "sx$(σx)_d")
     for (j,Nc) in enumerate(Ncvals)
-        d_ideal = h5read(joinpath(@__DIR__, "../../mode_convergence/$Emstr/$Rstr/sm0/Nc$Nc/out.h5"), "sx$(σx)_d")
+        d_ideal = h5read(joinpath(@__DIR__, "../../../mode_convergence/$Emstr/$Rstr/sm0/Nc$Nc/out.h5"), "sx$(σx)_d")
         err_vals[j] = mean(abs.(d_ideal .- ideal_ref) ./ ideal_ref)
     end
     lines!(ax, cav_e, err_vals, linestyle=:dot, color=:black, linewidth=3)

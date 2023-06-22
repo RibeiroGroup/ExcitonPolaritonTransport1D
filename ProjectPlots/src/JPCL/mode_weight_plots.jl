@@ -36,7 +36,7 @@ end
 
 function plot_ideal_mw!(ax::Axis; σx=120, Em=2.0, zeroq=true)
 
-    e = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "e")
+    e = h5read(joinpath(@__DIR__, "../../../mode_weight/cavity.h5"), "e")
 
     even = [i%2 == 0 for i = eachindex(e)]
     odd = even .== false
@@ -47,7 +47,7 @@ function plot_ideal_mw!(ax::Axis; σx=120, Em=2.0, zeroq=true)
     for ΩR in [0.05, 0.1, 0.2, 0.3]
         Rstr = "R" * replace(string(ΩR), "."=>"p")
         Estr = "Em" * replace(string(Em), "."=>"p")
-        mw = h5read(joinpath(@__DIR__,"../../mode_weight/$(mstr)_exc_momentum/$Estr/$Rstr/out.h5"), "$(σx)_phot_weight")
+        mw = h5read(joinpath(@__DIR__,"../../../mode_weight/$(mstr)_exc_momentum/$Estr/$Rstr/out.h5"), "$(σx)_phot_weight")
         lines!(ax, e[even], mw[even], label=L"%$(ΩR)", linewidth=2.5, color=Cycled(i))
         lines!(ax, e[odd], mw[odd], linestyle=:dash, linewidth=2.5, color=Cycled(i))
         i += 1
@@ -56,8 +56,8 @@ end
 
 function plot_ideal_mw_q!(ax::Axis; σx=120, Em=2.0, zeroq=true)
 
-    e = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "e")
-    w = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "w")
+    e = h5read(joinpath(@__DIR__, "../../../mode_weight/cavity.h5"), "e")
+    w = h5read(joinpath(@__DIR__, "../../../mode_weight/cavity.h5"), "w")
 
     perm = sortperm(w)
 
@@ -66,7 +66,7 @@ function plot_ideal_mw_q!(ax::Axis; σx=120, Em=2.0, zeroq=true)
     for ΩR in [0.05, 0.1, 0.2, 0.3]
         Rstr = "R" * replace(string(ΩR), "."=>"p")
         Estr = "Em" * replace(string(Em), "."=>"p")
-        mw = h5read(joinpath(@__DIR__,"../../mode_weight/$(mstr)_exc_momentum/$Estr/$Rstr/out.h5"), "$(σx)_phot_weight")
+        mw = h5read(joinpath(@__DIR__, "../../../mode_weight/$(mstr)_exc_momentum/$Estr/$Rstr/out.h5"), "$(σx)_phot_weight")
         lines!(ax, w[perm], mw[perm], label=L"%$(ΩR)", linewidth=2.5)
     end
 end
@@ -93,7 +93,7 @@ function barplot_dis_mw!(ax::Axis; σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=fa
     Emstr = "Em" * replace(string(Em), '.'=>'p')
     Rstr = "R" * replace(string(ΩR), '.'=>'p')
 
-    cav_e = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "e")
+    cav_e = h5read(joinpath(@__DIR__, "../../../mode_weight/cavity.h5"), "e")
 
     ER = early ? "EARLY_" : ""
 
@@ -104,7 +104,7 @@ function barplot_dis_mw!(ax::Axis; σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=fa
     upbounds = (2 + Δω):Δω:3.5
 
     σMstr = "sm" * replace(string(σM), '.'=>'p')
-    path = joinpath(@__DIR__, "../../mode_weight/disorder/$Emstr/$Rstr/$σMstr/out.h5")
+    path = joinpath(@__DIR__, "../../../mode_weight/disorder/$Emstr/$Rstr/$σMstr/out.h5")
 
     # Arrays to hold the sum of weights for each bar
     mw_even = zeros(Measurement, length(upbounds))
@@ -186,7 +186,7 @@ function plot_dis_mw!(ax::Axis;σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=false,
     Emstr = "Em" * replace(string(Em), '.'=>'p')
     Rstr = "R" * replace(string(ΩR), '.'=>'p')
 
-    cav_e = h5read(joinpath(@__DIR__, "../../mode_weight/cavity.h5"), "e")
+    cav_e = h5read(joinpath(@__DIR__, "../../../mode_weight/cavity.h5"), "e")
 
     ER = early ? "EARLY_" : ""
 
@@ -194,7 +194,7 @@ function plot_dis_mw!(ax::Axis;σx=120, σM=0.005, Em=2.0, ΩR=0.1, early=false,
     odd = even .== false
 
     σMstr = "sm" * replace(string(σM), '.'=>'p')
-    path = joinpath(@__DIR__, "../../mode_weight/disorder/$Emstr/$Rstr/$σMstr/out.h5")
+    path = joinpath(@__DIR__, "../../../mode_weight/disorder/$Emstr/$Rstr/$σMstr/out.h5")
 
     maxp = zeroq ? maximum(h5read(path, "q0_$(σx)_phot_cont")) : maximum(h5read(path, "nzq_$(σx)_phot_cont"))
     println("Maximum photon probability for Em=$Em σx=$σx ΩR=$ΩR σM=$σM =>  $maxp")
