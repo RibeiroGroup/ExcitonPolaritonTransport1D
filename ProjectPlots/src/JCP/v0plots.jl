@@ -13,7 +13,7 @@ function v0_vs_rabi!(ax::Axis; σx=120, σM=0.005, color=Makie.wong_colors()[1],
     for i in 1:4
 	    Rstr = replace(string(ΩRvals[i]), "." => "p") 
         sm = replace(string(σM), "." => "p") 
-        path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+        path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
 
         d = h5read(path, "$(Int(σx))_avg_d")
         a,b = get_linear_fit(r1, d[1:length(r1)])
@@ -36,7 +36,7 @@ function v0_vs_dis!(ax::Axis; σx=120, ΩR=0.05, color=Makie.wong_colors()[1], m
 
     for i in 1:10
         sm = replace(string(smvals[i]), "." => "p") 
-        path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+        path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
 
         d = h5read(path, "$(Int(σx))_avg_d")
         a,b = get_linear_fit(r1, d[1:length(r1)])
@@ -77,7 +77,7 @@ function v0_vs_reldis!(ax::Axis)
             for k in eachindex(σxvals)
 	            Rstr = replace(string(ΩRvals[i]), "." => "p") 
                 sm = replace(string(σMvals[j]), "." => "p") 
-                path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+                path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
                 d = h5read(path, "$(σxvals[k])_avg_d")
                 a,b = get_linear_fit(r1, d[1:length(r1)])
                 v0vals[i,j,k] = b
@@ -126,7 +126,7 @@ function v0_vs_σx_fixed_reldis!(ax::Axis; reldis=0.2)
         sm = replace(string(σM), "." => "p") 
         v0vals .= 0
         for k in eachindex(σxvals)
-            path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+            path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
             d = h5read(path, "$(σxvals[k])_avg_d")
             a,b = get_linear_fit(r1, d[1:length(r1)])
             v0vals[k] = b
@@ -166,7 +166,7 @@ function linearity_ratio!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64
 
 	Rstr = replace(string(ΩR), "." => "p") 
     sm = replace(string(σM), "." => "p") 
-    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
 
     # Get time values
     r1 = 0:0.005:0.5

@@ -91,7 +91,7 @@ function d_propagation!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0
 
 	Rstr = replace(string(ΩR), "." => "p") 
     sm = replace(string(σM), "." => "p") 
-    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
 
     # Get time values
     r1 = 0:0.005:0.5
@@ -116,7 +116,7 @@ function d_polyfit!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005
 
 	Rstr = replace(string(ΩR), "." => "p") 
     sm = replace(string(σM), "." => "p") 
-    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
 
     # Get time values
     r1 = 0:0.005:0.5
@@ -168,7 +168,7 @@ end
 function complete_span(ΩR, σM, σx, p=0.001)
 	Rstr = replace(string(ΩR), "." => "p") 
     sm = replace(string(σM), "." => "p") 
-    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm500_Nc500_a10_1/R$Rstr/sm$sm/out.h5")
+    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
     r1 = 0:0.005:0.5
     r2 = 1.0:0.5:5
     tvals = vcat(r1, r2)
