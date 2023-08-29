@@ -5,6 +5,6 @@ using WGLMakie
 
 
 include("JPCL/jpcl.jl")
-include("JCP/jcp.jl")
+include("Nanophotonics/nanophotonics.jl")
 
 end # module

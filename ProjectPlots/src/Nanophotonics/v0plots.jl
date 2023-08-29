@@ -138,27 +138,17 @@ end
 
 function linearity_ratio(;ΩRvals::Vector=[0.05, 0.1, 0.2, 0.3], σx::Int=120, σM::Float64=0.005)
     fig = Figure()
-    ax = Axis(fig[1,1], xlabel="Time (ps)", ylabel=L"(|c_0| + |c_1|)/\sum_{n>1}|c_n|", title=L"Linearity Ratio $\sigma_x = %$(σx)$ nm $\sigma_M = %$(σM)$ eV")
+    ax = Axis(fig[1,1], xlabel="Time (ps)", ylabel=L"Fit residual ($R$)")
 
     colors = Makie.wong_colors()
     for (ΩR,c) in zip(ΩRvals, colors)
         linearity_ratio!(ax, ΩR=ΩR, σx=σx, σM=σM, color=c, label=L"%$ΩR")
     end
 
-    axislegend(ax, ax, L"\Omega_R\;\text{(eV)}", position=:lt)
-    fig
-end
-
-function linearity_ratio2(;ΩR=0.1, σMvals::Vector=[0.005, 0.01, 0.02, 0.04, 0.08, 0.1, 0.2, 0.3, 0.4, 0.5], σx::Int=120)
-    fig = Figure()
-    ax = Axis(fig[1,1], xlabel="Time (ps)", ylabel=L"(|c_0| + |c_1|)/\sum_{n>1}|c_n|", title=L"Linearity Ratio $\sigma_x = %$(σx)$ nm $\Omega_R = %$(ΩR)$ eV")
-
-    colors = Makie.wong_colors()
-    for (σM,c) in zip(σMvals, colors)
-        linearity_ratio!(ax, ΩR=ΩR, σx=σx, σM=σM, color=c, label=L"%$σM")
-    end
-
-    axislegend(ax, ax, L"\sigma_M\;\text{(eV)}", position=:rt)
+    xlims!(ax, 0, 2)
+    ylims!(ax, 0.7, 1.05)
+    axislegend(ax, ax, L"\Omega_R\;\text{(eV)}", position=:rt)
+    hlines!(ax, [0.95], linestyle=:dot, color=:gray)
     fig
 end
 
@@ -177,25 +167,10 @@ function linearity_ratio!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64
     σd = h5read(path, "$(Int(σx))_std_d")
 
     coef = polyfit(tvals, d, polyorder)
+    dsmooth = [eval_poly(t, coef) for t in tvals]
 
-    idx, tfinal = ProjectPlots.JCP.complete_span(ΩR, σM, σx, 0.01)
+    idx, tfinal = ProjectPlots.Nanophotonics.complete_span(ΩR, σM, σx, 0.01)
 
-    #if idx !== Inf
-    #    lines!(ax, tvals[1:idx], [eval_poly(t, coef) for t in tvals[1:idx]], color=color, label=label)
-    #else
-    #    lines!(ax, tvals, [eval_poly(t, coef) for t in tvals], color=color, label=label)
-    #end
-
-    # Get critical point
-    #for t in tvals[10:end]
-    #    lin = coef[1] + coef[2]*t
-    #    nonlin = sum([coef[n] * t^(n-1) for n = 3:length(coef)])
-    #    if lin / abs(nonlin) < 10
-    #        println("$t   $(lin/nonlin)")
-    #        vlines!(ax, [t], color=color)
-    #        break
-    #    end
-    #end
     t1 = 0.1:0.005:0.5
     tfits = vcat(t1, r2)
     Rvals = zeros(length(tfits))
@@ -203,16 +178,19 @@ function linearity_ratio!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64
     for i in eachindex(tfits)
         tt = tfits[i]
         idx = 20 + i
-        cs = polyfit(tvals[1:idx], d[1:idx], 1)
+        cs = polyfit(tvals[1:idx], dsmooth[1:idx], 1)
         #lines!(ax, tvals, [eval_poly(t, cs) for t in tvals])
-        Rvals[i] = residual(tvals[1:idx], d[1:idx], cs)
+        Rvals[i] = residual(tvals[1:idx], dsmooth[1:idx], cs)
     end
 
     m,mi = findmax(Rvals)
     println(mi)
-    critical = findfirst(x->x<0.98, Rvals[mi:end]) + mi
+    critical = findfirst(x->x<0.95, Rvals[mi:end]) + mi
     println(tfits[critical])
-    vlines!(ax, [tfits[critical]])
+    vlines!(ax, [tfits[critical]], linestyle=:dash, color=color)
 
-    lines!(ax, tfits, Rvals, label="")
+    #cs = complete_span(ΩR, σM, σx, 0.01)
+    #vlines!(ax, [cs[2]], linestyle=:solid)
+
+    lines!(ax, tfits, Rvals, label=label, color=color)
 end
