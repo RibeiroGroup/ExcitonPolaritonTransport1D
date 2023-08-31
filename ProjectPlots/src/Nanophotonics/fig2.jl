@@ -10,10 +10,10 @@ function fig2(;σxvals=[120, 480], ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], sh
 
     # Create grid of axes
     gd = fig[1,1] = GridLayout()
-    ax1 = Axis(gd[1,1], ylabel=L"Exciton Escape Probability ($\chi$)")
-    ax2 = Axis(gd[2,1], xlabel="Time (ps)", ylabel=L"RMSD ($\mu$m)")
-    ax3 = Axis(gd[1,2])
-    ax4 = Axis(gd[2,2], xlabel="Time (ps)")
+    ax1 = Axis(gd[1,1], ylabel=L"Escape Probability ($\chi$)", title=L"$\sigma_x = %$(σxvals[1])$ nm")
+    ax2 = Axis(gd[2,1], ylabel=L"RMSD ($\mu$m)", xticks=0:5)
+    ax3 = Axis(gd[1,2], title=L"$\sigma_x = %$(σxvals[2])$ nm")
+    ax4 = Axis(gd[2,2], xticks=0:5)
     axs = [ax1 ax3; ax2 ax4]
 
     # Link axes so they have the same plotting range
@@ -21,14 +21,16 @@ function fig2(;σxvals=[120, 480], ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], sh
     linkyaxes!(ax3, ax1)
     linkyaxes!(ax4, ax2)
 
+    xlims!(ax4, -0.1, 5)
+    ylims!(ax3, 0, 0.7)
+    ylims!(ax4, 0, 5)
+
     # Hide redundant axis info
     hideydecorations!(ax3, grid=false)
     hideydecorations!(ax4, grid=false)
 
     hidexdecorations!(ax1, grid=false)
     hidexdecorations!(ax3, grid=false)
-
-    xlims!(ax4, -0.1, 5)
 
     rel_dis = ["$(round(σM/ΩR, digits=2))" for σM in σMvals]
 
@@ -43,7 +45,10 @@ function fig2(;σxvals=[120, 480], ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], sh
     end
 
     linkxaxes!(ax1, ax2)
-    axislegend(ax1, merge=true)
+
+    Label(gd[3,1:2], "Time (ps)")
+
+    Legend(gd[4,1:2], ax1, L"\sigma_M/\Omega_R", orientation=:horizontal, merge=true, titleposition=:left)
     fig
 end
 
