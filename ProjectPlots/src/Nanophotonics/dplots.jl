@@ -8,6 +8,7 @@ function rmsd_propagation!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float6
 	Rstr = replace(string(ΩR), "." => "p") 
     sm = replace(string(σM), "." => "p") 
     path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
+    #path = joinpath(@__DIR__, "../../../propagation_study/non_zero_q/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
 
     # Get time values
     r1 = 0:0.005:0.5
@@ -23,10 +24,10 @@ function rmsd_propagation!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float6
     if show_std
         band!(ax, tvals, rmsd .- std, rmsd .+ std, color=(color, 0.5))
     end
-    lines!(ax, tvals, rmsd, color=color, label=label)
+    lines!(ax, tvals, rmsd, color=color, label=label, linewidth=3)
 
     if fit
-        a,b = get_linear_fit(r1, d[1:length(r1)])
+        a,b = get_linear_fit(r1, rmsd[1:length(r1)])
         println(b)
         lfit = [a+b*t for t in tvals]
         lines!(ax, tvals, lfit, color=color, linewidth=2, linestyle=:dot)

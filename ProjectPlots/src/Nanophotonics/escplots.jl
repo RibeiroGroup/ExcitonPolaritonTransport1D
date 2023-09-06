@@ -25,6 +25,7 @@ function wvp_escape_probability(ΩR, σx, σM, idx)
 	Rstr = replace(string(ΩR), "." => "p") 
     sm = replace(string(σM), "." => "p") 
     path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
+    #path = joinpath(@__DIR__, "../../../propagation_study/non_zero_q/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
 
     wvp = h5read(path, "$(Int(σx))_avg_wvp", (:, idx))
     wvp = wvp ./ sum(wvp)
