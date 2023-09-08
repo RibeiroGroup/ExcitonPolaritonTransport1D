@@ -33,7 +33,7 @@ function fig4()
     end
 
     Label(gd[3,1:2], L"$\delta = E_\text{min} - E_M$ (eV)")
-    Label(gd[1:2,0], L"$v_0$ ($\mu$m ps$^{-1}$)", rotation=π/2, fontsize=25)
+    Label(gd[1:2,0], L"$v_0$ ($\mu$m$\cdot$ps$^{-1}$)", rotation=π/2, fontsize=25)
     Legend(gd[4,1:2], axs[1], L"\sigma_M/\Omega_R", orientation=:horizontal, merge=true, titleposition=:left)
 
     rowgap!(gd, 2, 10)

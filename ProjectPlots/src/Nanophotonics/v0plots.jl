@@ -78,7 +78,7 @@ function v0_vs_reldis!(ax::Axis)
 	            Rstr = replace(string(ΩRvals[i]), "." => "p") 
                 sm = replace(string(σMvals[j]), "." => "p") 
                 path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
-                d = h5read(path, "$(σxvals[k])_avg_d")
+                d = 0.01 * h5read(path, "$(σxvals[k])_avg_d")
                 a,b = get_linear_fit(r1, d[1:length(r1)])
                 v0vals[i,j,k] = b
             end
@@ -127,7 +127,7 @@ function v0_vs_σx_fixed_reldis!(ax::Axis; reldis=0.2)
         v0vals .= 0
         for k in eachindex(σxvals)
             path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
-            d = h5read(path, "$(σxvals[k])_avg_d")
+            d = 0.01 * h5read(path, "$(σxvals[k])_avg_d")
             a,b = get_linear_fit(r1, d[1:length(r1)])
             v0vals[k] = b
         end
