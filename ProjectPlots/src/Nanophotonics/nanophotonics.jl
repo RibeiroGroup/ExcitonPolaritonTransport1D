@@ -9,6 +9,8 @@ include("dplots.jl")
 include("v0plots.jl")
 include("escplots.jl")
 include("fig2.jl")
-include("detun.jl")
+include("fig3.jl")
+include("fig4.jl")
+include("fig5.jl")
 
 end # module

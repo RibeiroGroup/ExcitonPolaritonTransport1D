@@ -4,7 +4,7 @@ using LaTeXStrings
 using Statistics
 using Measurements
 
-function fig4()
+function fig5()
 
     fontsize_theme = Theme(fontsize = 20)
     set_theme!(fontsize_theme)
@@ -65,7 +65,7 @@ function v0_vs_detuning!(ax; ΩR=0.1, σx=480, σM=0.005, Emvals=[1.8, 1.9, 2.0,
     scatter!(ax, 2.0 .- Emvals, v0, color=color, label=label)
 end
 
-function fig5()
+function fig5b()
 
     fontsize_theme = Theme(fontsize = 20)
     set_theme!(fontsize_theme)

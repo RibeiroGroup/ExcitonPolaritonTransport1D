@@ -2,7 +2,12 @@ function get_linear_fit(x, y::Vector{T}) where T
     X = zeros(typeof(x[1]), length(x), 2)
     X[:,1] .= 1
     X[:,2] .= x
-    return X \ y
+    a,b = X \ y
+
+    r = residual(x, y, [a,b])
+    println("Residual: $r")
+
+    return a,b
 end
 
 function polyfit(x, y, n)
