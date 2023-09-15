@@ -114,18 +114,19 @@ function d_vs_σx(;ΩR::Float64=0.05, σxvals::Vector=[60, 120, 240, 360, 480], 
     fig
 end
 
-function d_propagation(; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, show_std=false, color=Makie.wong_colors()[1], fit=false)
+function d_propagation(; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, Em=2.0, show_std=false, color=Makie.wong_colors()[1], fit=false)
     fig = Figure()
     ax = Axis(fig[1,1], xlabel="Time (ps)", ylabel=L"d = \sqrt{\langle x^2 \rangle} / a")
-    d_propagation!(ax, ΩR=ΩR, σx=σx, σM=σM, show_std=show_std, color=color, fit=fit)
+    d_propagation!(ax, ΩR=ΩR, σx=σx, σM=σM, Em=Em, show_std=show_std, color=color, fit=fit)
     fig
 end
 
-function d_propagation!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, show_std=false, color=Makie.wong_colors()[1], label="", fit=false)
+function d_propagation!(ax::Axis; Em=2.0, ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, show_std=false, color=Makie.wong_colors()[1], label="", fit=false)
 
 	Rstr = replace(string(ΩR), "." => "p") 
     sm = replace(string(σM), "." => "p") 
-    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
+    δstr = replace(string(Em), "." => "p")
+    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em$δstr/R$Rstr/sm$sm/out.h5")
 
     # Get time values
     r1 = 0:0.005:0.5

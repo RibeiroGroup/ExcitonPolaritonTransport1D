@@ -13,4 +13,6 @@ include("fig3.jl")
 include("fig4.jl")
 include("fig5.jl")
 
+include("generate.jl")
+
 end # module

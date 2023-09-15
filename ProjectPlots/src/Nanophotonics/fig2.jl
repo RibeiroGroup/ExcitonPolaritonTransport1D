@@ -2,7 +2,7 @@ using Makie
 using HDF5
 using LaTeXStrings
 
-function fig2(;σx=120, ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], show_std=false, fit=false)
+function fig2(;σx=120, ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], show_std=false, fit=true)
     fontsize_theme = Theme(fontsize = 25)
     set_theme!(fontsize_theme)
 

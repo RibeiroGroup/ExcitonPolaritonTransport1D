@@ -102,7 +102,6 @@ function get_wvp!(ax::Axis; ΩR=0.1, σx=120, σM=0.005, t=0, normalize=false, y
 	Rstr = replace(string(ΩR), "." => "p") 
     sm = replace(string(σM), "." => "p") 
     path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
-    #path = joinpath(@__DIR__, "../../../propagation_study/non_zero_q/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
 
     r1 = 0:0.005:0.5
     r2 = 1.0:0.5:5
@@ -125,6 +124,9 @@ function get_wvp!(ax::Axis; ΩR=0.1, σx=120, σM=0.005, t=0, normalize=false, y
 
     barplot!(ax, 0:0.5:49.5, wvp, fillto=yshift, color=color)
     text!(ax, 25, -0.003, text=L"\text{RMSD} = %$(round(d, digits=2))\;\; \chi = %$(round(escp, digits=2))", align=(:center,:top), fontsize=18)
+
+    # debug
+    #println("t = $t σM = $σM RMSD from wvp = $(rmsd_from_wvp(wvp))")
 
     if quartile
         q1, q2, q3 = get_quartiles(0:0.5:49.5, wvp)
@@ -160,6 +162,6 @@ function rmsd_from_wvp(wvp)
 
     x2 = (meanx .- avgx) .^ 2
 
-    return sum(x2 .* wvp)
+    return √sum(x2 .* wvp)
 end
 
