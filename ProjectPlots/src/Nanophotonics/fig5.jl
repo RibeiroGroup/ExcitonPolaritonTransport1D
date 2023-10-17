@@ -4,7 +4,7 @@ using LaTeXStrings
 using Statistics
 using Measurements
 
-function fig5(;σx=120)
+function fig5(;σx=240)
     fontsize_theme = Theme(fontsize = 20)
     set_theme!(fontsize_theme)
 
@@ -23,7 +23,7 @@ function fig5(;σx=120)
         maxd_vs_detuning!(ax2, σx=σx, σM=σM,label="$(10*σM)", color=Makie.Cycled(i))
     end
 
-    Label(gd[2,1:2], L"Detuning $\delta = E_\text{min} - E_M$ (eV)")
+    Label(gd[2,1:2], L"Detuning $\delta = \hbar\omega_0 - E_M$ (eV)")
     Legend(gd[3,1:2], ax1, L"\sigma_M/\Omega_R", orientation=:horizontal, merge=true, titleposition=:left)
 
     rowgap!(gd, 1, Relative(0.008))

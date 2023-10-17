@@ -12,6 +12,7 @@ include("fig2.jl")
 include("fig3.jl")
 include("fig4.jl")
 include("fig5.jl")
+include("SI.jl")
 
 include("generate.jl")
 

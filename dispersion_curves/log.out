@@ -1,0 +1,229 @@
+Starting dispersion computations
+           ---Quantum System Input Parameters---       
+
+              # Light-Matter Interaction #             
+Rabi Frequency (ΩR):                                   0.1 eV
+
+                # Molecular Properties #               
+Number of molecules (Nm):                              5000
+Average intermolecular distance (a):                   10 nm
+Intermolecular distance standard deviation (σa):       0 nm
+Average molecular excitation energy (ωM):              1.5 eV
+Molecular excitation energy standard deviation (σM):   0 eV
+
+                # Cavity/Wire Properties #               
+Number of positive cavity modes (Nc):                  200
+Cavity y dimension size (Ly):                          200 nm
+Cavity z dimension size (Lz):                          400 nm
+y-momentum quantum number (ny):                        1
+z-momentum quantum number (nz):                        1
+Index of refraction squared (ϵ):                       3.0
+
+Length along x (Nm * a) 50000.00000000 nm
+
+ Minimum Cavity energy:    2.0007863989
+ Maximum Cavity energy:    3.4930773910
+
+ # Total System Dimensions: 5401x5401
+Memory required for Hamiltonian Matrix: 0.467 Gb | 466.733 Mb
+
+## Constructing Hamiltonian Matrix
+Allocating memory... Done.
+Populating diagonal... Done.
+Populating off-diagonal... Done.
+
+## Diagonalization
+BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
+BLAS Number of Threads: 4
+
+Diagonalization started... Done in  413.91147 seconds.
+           ---Quantum System Input Parameters---       
+
+              # Light-Matter Interaction #             
+Rabi Frequency (ΩR):                                   0.1 eV
+
+                # Molecular Properties #               
+Number of molecules (Nm):                              5000
+Average intermolecular distance (a):                   10 nm
+Intermolecular distance standard deviation (σa):       0 nm
+Average molecular excitation energy (ωM):              1.8 eV
+Molecular excitation energy standard deviation (σM):   0 eV
+
+                # Cavity/Wire Properties #               
+Number of positive cavity modes (Nc):                  200
+Cavity y dimension size (Ly):                          200 nm
+Cavity z dimension size (Lz):                          400 nm
+y-momentum quantum number (ny):                        1
+z-momentum quantum number (nz):                        1
+Index of refraction squared (ϵ):                       3.0
+
+Length along x (Nm * a) 50000.00000000 nm
+
+ Minimum Cavity energy:    2.0007863989
+ Maximum Cavity energy:    3.4930773910
+
+ # Total System Dimensions: 5401x5401
+Memory required for Hamiltonian Matrix: 0.467 Gb | 466.733 Mb
+
+## Constructing Hamiltonian Matrix
+Allocating memory... Done.
+Populating diagonal... Done.
+Populating off-diagonal... Done.
+
+## Diagonalization
+BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
+BLAS Number of Threads: 4
+
+Diagonalization started... Done in  455.99581 seconds.
+           ---Quantum System Input Parameters---       
+
+              # Light-Matter Interaction #             
+Rabi Frequency (ΩR):                                   0.1 eV
+
+                # Molecular Properties #               
+Number of molecules (Nm):                              5000
+Average intermolecular distance (a):                   10 nm
+Intermolecular distance standard deviation (σa):       0 nm
+Average molecular excitation energy (ωM):              1.9 eV
+Molecular excitation energy standard deviation (σM):   0 eV
+
+                # Cavity/Wire Properties #               
+Number of positive cavity modes (Nc):                  200
+Cavity y dimension size (Ly):                          200 nm
+Cavity z dimension size (Lz):                          400 nm
+y-momentum quantum number (ny):                        1
+z-momentum quantum number (nz):                        1
+Index of refraction squared (ϵ):                       3.0
+
+Length along x (Nm * a) 50000.00000000 nm
+
+ Minimum Cavity energy:    2.0007863989
+ Maximum Cavity energy:    3.4930773910
+
+ # Total System Dimensions: 5401x5401
+Memory required for Hamiltonian Matrix: 0.467 Gb | 466.733 Mb
+
+## Constructing Hamiltonian Matrix
+Allocating memory... Done.
+Populating diagonal... Done.
+Populating off-diagonal... Done.
+
+## Diagonalization
+BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
+BLAS Number of Threads: 4
+
+Diagonalization started... Done in  418.70526 seconds.
+           ---Quantum System Input Parameters---       
+
+              # Light-Matter Interaction #             
+Rabi Frequency (ΩR):                                   0.1 eV
+
+                # Molecular Properties #               
+Number of molecules (Nm):                              5000
+Average intermolecular distance (a):                   10 nm
+Intermolecular distance standard deviation (σa):       0 nm
+Average molecular excitation energy (ωM):              2.0 eV
+Molecular excitation energy standard deviation (σM):   0 eV
+
+                # Cavity/Wire Properties #               
+Number of positive cavity modes (Nc):                  200
+Cavity y dimension size (Ly):                          200 nm
+Cavity z dimension size (Lz):                          400 nm
+y-momentum quantum number (ny):                        1
+z-momentum quantum number (nz):                        1
+Index of refraction squared (ϵ):                       3.0
+
+Length along x (Nm * a) 50000.00000000 nm
+
+ Minimum Cavity energy:    2.0007863989
+ Maximum Cavity energy:    3.4930773910
+
+ # Total System Dimensions: 5401x5401
+Memory required for Hamiltonian Matrix: 0.467 Gb | 466.733 Mb
+
+## Constructing Hamiltonian Matrix
+Allocating memory... Done.
+Populating diagonal... Done.
+Populating off-diagonal... Done.
+
+## Diagonalization
+BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
+BLAS Number of Threads: 4
+
+Diagonalization started... Done in  445.45951 seconds.
+           ---Quantum System Input Parameters---       
+
+              # Light-Matter Interaction #             
+Rabi Frequency (ΩR):                                   0.1 eV
+
+                # Molecular Properties #               
+Number of molecules (Nm):                              5000
+Average intermolecular distance (a):                   10 nm
+Intermolecular distance standard deviation (σa):       0 nm
+Average molecular excitation energy (ωM):              2.1 eV
+Molecular excitation energy standard deviation (σM):   0 eV
+
+                # Cavity/Wire Properties #               
+Number of positive cavity modes (Nc):                  200
+Cavity y dimension size (Ly):                          200 nm
+Cavity z dimension size (Lz):                          400 nm
+y-momentum quantum number (ny):                        1
+z-momentum quantum number (nz):                        1
+Index of refraction squared (ϵ):                       3.0
+
+Length along x (Nm * a) 50000.00000000 nm
+
+ Minimum Cavity energy:    2.0007863989
+ Maximum Cavity energy:    3.4930773910
+
+ # Total System Dimensions: 5401x5401
+Memory required for Hamiltonian Matrix: 0.467 Gb | 466.733 Mb
+
+## Constructing Hamiltonian Matrix
+Allocating memory... Done.
+Populating diagonal... Done.
+Populating off-diagonal... Done.
+
+## Diagonalization
+BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
+BLAS Number of Threads: 4
+
+Diagonalization started... Done in  441.96481 seconds.
+           ---Quantum System Input Parameters---       
+
+              # Light-Matter Interaction #             
+Rabi Frequency (ΩR):                                   0.1 eV
+
+                # Molecular Properties #               
+Number of molecules (Nm):                              5000
+Average intermolecular distance (a):                   10 nm
+Intermolecular distance standard deviation (σa):       0 nm
+Average molecular excitation energy (ωM):              2.2 eV
+Molecular excitation energy standard deviation (σM):   0 eV
+
+                # Cavity/Wire Properties #               
+Number of positive cavity modes (Nc):                  200
+Cavity y dimension size (Ly):                          200 nm
+Cavity z dimension size (Lz):                          400 nm
+y-momentum quantum number (ny):                        1
+z-momentum quantum number (nz):                        1
+Index of refraction squared (ϵ):                       3.0
+
+Length along x (Nm * a) 50000.00000000 nm
+
+ Minimum Cavity energy:    2.0007863989
+ Maximum Cavity energy:    3.4930773910
+
+ # Total System Dimensions: 5401x5401
+Memory required for Hamiltonian Matrix: 0.467 Gb | 466.733 Mb
+
+## Constructing Hamiltonian Matrix
+Allocating memory... Done.
+Populating diagonal... Done.
+Populating off-diagonal... Done.
+
+## Diagonalization
+BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
+BLAS Number of Threads: 4
+
+Diagonalization started... Done in  418.53308 seconds.

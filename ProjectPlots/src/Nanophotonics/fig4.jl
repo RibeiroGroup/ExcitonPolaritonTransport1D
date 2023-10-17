@@ -6,7 +6,7 @@ function fig4()
     gd = fig[1,1] = GridLayout()
 
     ax1 = Axis(gd[1,1], xticks=[100, 200, 300, 400])
-    ax2 = Axis(gd[2,1], xlabel=L"Wave packt initial spread - $\sigma_x$ (nm)", xticks=[100, 200, 300, 400])
+    ax2 = Axis(gd[2,1], xlabel=L"Wave packet initial spread - $\sigma_x$ (nm)", xticks=[100, 200, 300, 400])
     Label(gd[1:2,0], L"Initial spread velocity - $v_0$ ($\mu$m$\cdot$ps$^{-1}$)", rotation=π/2)
 
     hidexdecorations!(ax1, grid=false, ticks=false)
