@@ -4,6 +4,7 @@ using ProjectPlots
 
 include("fig1.jl")
 
+include("groupvel.jl")
 include("fits.jl")
 include("dplots.jl")
 include("v0plots.jl")

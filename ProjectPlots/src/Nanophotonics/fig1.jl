@@ -120,10 +120,10 @@ function get_wvp!(ax::Axis; ΩR=0.1, σx=120, σM=0.005, t=0, normalize=false, y
     wvp .+= yshift
 
     escp = wvp_escape_probability(ΩR, σx, σM, wvp_idx)
-    #text!(ax, 14, 0.2, text=L"P_M = %$(round(P, digits=2))", align=(:left,:top), fontsize=15)
+    text!(ax, 14, 0.2, text=L"P_M = %$(round(P, digits=2))", align=(:left,:top), fontsize=15)
 
     barplot!(ax, 0:0.5:49.5, wvp, fillto=yshift, color=color)
-    #text!(ax, 25, -0.003, text=L"\text{RMSD} = %$(round(d, digits=2))\;\; \chi = %$(round(escp, digits=2))", align=(:center,:top), fontsize=18)
+    text!(ax, 25, -0.003, text=L"\text{RMSD} = %$(round(d, digits=2))\;\; \chi = %$(round(escp, digits=2))", align=(:center,:top), fontsize=18)
 
     # debug
     #println("t = $t σM = $σM RMSD from wvp = $(rmsd_from_wvp(wvp))")

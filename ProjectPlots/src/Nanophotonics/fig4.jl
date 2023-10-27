@@ -1,4 +1,4 @@
-function fig4()
+function fig4(sys, f)
     fontsize_theme = Theme(fontsize = 25)
     set_theme!(fontsize_theme)
 
@@ -13,13 +13,13 @@ function fig4()
 
     linkaxes!(ax1, ax2)
     xlims!(ax2, 50,500)
+    ylims!(ax2, 0.0, 11)
 
-    σMvals = [0.02, 0.04, 0.1]
+    σMvals = [0.005, 0.02, 0.04, 0.1]
     σxvals = [60, 120, 240, 360, 480]
     r1 = 0:0.005:0.5
 
     # q = 0
-    mkers = [:circle, :diamond, :xcross]
     for (i,σM) in enumerate(σMvals)
         v0vals = zeros(5)
         for k in eachindex(σxvals)
@@ -29,8 +29,8 @@ function fig4()
             a,b = get_linear_fit(r1, d[1:length(r1)])
             v0vals[k] = b
         end
-        scatter!(ax1, σxvals, v0vals, label="$(Int(1000*σM))%", marker=mkers[i])
-        lines!(ax1, σxvals, v0vals, label="$(Int(1000*σM))%")
+        scatter!(ax1, σxvals, v0vals, label="$(Int(1000*σM))%", marker=:diamond, markersize=15)
+        lines!(ax1, σxvals, v0vals, label="$(Int(1000*σM))%", linewidth=2)
     end
 
     # q ≠ 0
@@ -43,15 +43,26 @@ function fig4()
             a,b = get_linear_fit(r1, d[1:length(r1)])
             v0vals[k] = b
         end
-        scatter!(ax2, σxvals, v0vals, label="$(Int(1000*σM))%", marker=mkers[i])
-        lines!(ax2, σxvals, v0vals, label="$(Int(1000*σM))%")
+        scatter!(ax2, σxvals, v0vals, label="$(Int(1000*σM))%", marker=:diamond, markersize=15)
+        lines!(ax2, σxvals, v0vals, label="$(Int(1000*σM))%", linewidth=2)
     end
+
+    # Estimated
+    mker = :star5
+    c = :silver
+    scatter!(ax1, σxvals, [f(sys, σx, 0.0) for σx in σxvals], marker=mker, color=c, markersize=15)
+    lines!(ax1, σxvals, [f(sys, σx, 0.0) for σx in σxvals], linestyle=:dot, color=c, linewidth=2)
+    scatter!(ax2, σxvals, [f(sys, σx, 0.005654866776461627) for σx in σxvals], marker=mker, color=c, markersize=15)
+    lines!(ax2, σxvals, [f(sys, σx, 0.005654866776461627) for σx in σxvals], linestyle=:dot, color=c, linewidth=2)
 
     text!(ax1, 0.1, 1, text="(a)", align=(:right, :top), space=:relative, font=:bold, fontsize=25)
     text!(ax1, 0.25, 1, text=L"\bar{q}_0 = 0", align=(:right, :top), space=:relative, font=:bold, fontsize=25)
     text!(ax2, 0.1, 1, text="(b)", align=(:right, :top), space=:relative, font=:bold, fontsize=25)
     text!(ax2, 0.25, 1, text=L"\bar{q}_0 \neq 0", align=(:right, :top), space=:relative, font=:bold, fontsize=25)
     Legend(gd[3,1], ax2, L"\sigma_M/\Omega_R", orientation=:horizontal, merge=true, titleposition=:left)
+
+    rowgap!(gd, 2, 5)
+    colgap!(gd, 1, 5)
 
     fig
 end

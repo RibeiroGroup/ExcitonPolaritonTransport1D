@@ -2,20 +2,26 @@ function fig3()
     fontsize_theme = Theme(fontsize = 25)
     set_theme!(fontsize_theme)
 
-    fig = Figure(resolution=(800, 450))
+    fig = Figure(resolution=(800, 400))
 
     # Create grid of axes
     gd = fig[1,1] = GridLayout()
-    ax = Axis(gd[1,1], xlabel=L"\text{Relative disorder}\;(\sigma_M/\Omega_R)", ylabel=L"v_0\;(\mu\text{m}\cdot \text{ps}^{-1})")
-    v0_vs_reldis!(ax)
-    xlims!(ax, 0, 2.05)
-    ylims!(ax, 0, 20)
+    ax1 = Axis(gd[1,1], ylabel=L"v_0\;(\mu\text{m}\cdot \text{ps}^{-1})")
+    ax2 = Axis(gd[1,2])
+    hideydecorations!(ax2, ticks=false, grid=false)
+    v0_vs_reldis!(ax1, σx=120)
+    v0_vs_reldis!(ax2, σx=480)
+    xlims!(ax1, 0, 2.05)
+    ylims!(ax1, 0, 20)
 
-    axislegend(ax, [[MarkerElement(marker=m, color=:black) for m = (:circle, :rect, :cross, :utriangle, :star5)],
-    [PolyElement(color=c, strokecolor=:transparent) for c in Makie.wong_colors()[1:4]]],
-    [string.([60,120,240,360,480]), string.([0.05, 0.1, 0.2, 0.3])],
-    [L"\sigma_x\;(\text{nm})", L"\Omega_R\;(\text{eV})"], orientation=:horizontal, titleposition=:top, nbanks=5,
-    tellheight=false, tellwidth=false)
+    xlims!(ax2, 0, 2.05)
+    ylims!(ax2, 0, 20)
+
+    text!(ax1, 0.01, 0.95, text=L"(a) $\sigma_x = 120$ nm", space=:relative, align=(:left, :top), font=:bold)
+    text!(ax2, 0.01, 0.95, text=L"(b) $\sigma_x = 480$ nm", space=:relative, align=(:left, :top), font=:bold)
+    Label(gd[2,1:2], L"\text{Relative disorder}\;(\sigma_M/\Omega_R)")
+    rowgap!(gd, 1, 3)
+    axislegend(ax2, ax2, L"$\Omega_R$ (eV)", merge=true)
 
     fig
 end

@@ -63,39 +63,35 @@ function v0_vs_reldis()
     fig
 end
 
-function v0_vs_reldis!(ax::Axis)
+function v0_vs_reldis!(ax::Axis; σx=120)
 
     r1 = 0:0.005:0.5
 
     ΩRvals = [0.05, 0.1, 0.2, 0.3]
     σMvals = [0.005, 0.01, 0.02, 0.04, 0.08, 0.1, 0.2, 0.3, 0.4, 0.5]
-    σxvals = [60, 120, 240, 360, 480]
-    v0vals = zeros(length(ΩRvals), length(σMvals), length(σxvals))
+    #σxvals = [60, 120, 240, 360, 480]
+    v0vals = zeros(length(ΩRvals), length(σMvals))
 
     for i in eachindex(ΩRvals)
         for j in eachindex(σMvals)
-            for k in eachindex(σxvals)
-	            Rstr = replace(string(ΩRvals[i]), "." => "p") 
-                sm = replace(string(σMvals[j]), "." => "p") 
-                path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
-                d = 0.01 * h5read(path, "$(σxvals[k])_avg_d")
-                a,b = get_linear_fit(r1, d[1:length(r1)])
-                v0vals[i,j,k] = b
-            end
+	        Rstr = replace(string(ΩRvals[i]), "." => "p") 
+            sm = replace(string(σMvals[j]), "." => "p") 
+            path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
+            d = 0.01 * h5read(path, "$(σx)_avg_d")
+            a,b = get_linear_fit(r1, d[1:length(r1)])
+            v0vals[i,j] = b
         end
     end
 
-    mkers = [:circle, :rect, :cross, :utriangle, :star5]
     clrs = Makie.wong_colors()[1:4]
-    for k in eachindex(σxvals)
-        for i in eachindex(ΩRvals)
-            reldis = σMvals / ΩRvals[i]
-            v0 = v0vals[i,:,k]
-            scatter!(ax, reldis, v0, marker=mkers[k], color=clrs[i])
-            #if k == 3
-            #    lines!(ax, reldis, v0, marker=mkers[k], color=clrs[i])
-            #end
-        end
+    for i in eachindex(ΩRvals)
+        reldis = σMvals / ΩRvals[i]
+        v0 = v0vals[i,:]
+        scatter!(ax, reldis, v0, color=clrs[i], label=L"%$(ΩRvals[i])")
+        lines!(ax, reldis, v0, color=clrs[i], label=L"%$(ΩRvals[i])")
+        #if k == 3
+        #    lines!(ax, reldis, v0, marker=mkers[k], color=clrs[i])
+        #end
     end
 end
 

@@ -1,4 +1,4 @@
-function escp_over_time!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, color=Makie.wong_colors()[1], label="", fit=false)
+function escp_over_time!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, color=Makie.wong_colors()[1], label="", fit=false, mksize=9)
 
     # Get time values
     r1 = 0:0.005:0.5
@@ -13,7 +13,7 @@ function escp_over_time!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=
 
     get_edge_probability(ΩR, σx, σM)
 
-    scatter!(ax, tvals, escp, color=color, label=label)
+    scatter!(ax, tvals, escp, color=color, label=label, markersize=mksize)
     lines!(ax, tvals, escp, color=color, label=label)
 end
 
@@ -34,7 +34,7 @@ function wvp_escape_probability(ΩR, σx, σM, idx)
     n = 0
     s = 0
     r = nothing
-    while s < 0.98
+    while s < 0.998
         n += 1
         r = (50-n+1):(50+n)
         s = sum(wvp0[r])

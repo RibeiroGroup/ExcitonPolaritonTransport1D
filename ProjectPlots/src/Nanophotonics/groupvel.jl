@@ -1,4 +1,3 @@
-using PolaritonicSystems
 using LinearAlgebra
 
 struct PolaritonBranch{T}
@@ -61,17 +60,9 @@ function get_excitonic_vg(XP)
 
     #    ∂XP[i] = XP.mol_cont[i] .* (δE / δq) / (1000*ħ) # Convert to μm/ps
     #end
-    dEdq = numerical_derivative_three_point(XP.qvals, XP.evals)
+    dEdq = numerical_derivative_three_point(XP.qvals, XP.evals) ./ (1000*ħ)
     
-    return (XP.mol_cont .* dEdq) ./ (1000*ħ)
-end
-
-function plot_excitonic_vg(ΩR, Em)
-    fig = Figure()
-    ax = Axis(fig[1,1], xlabel=L"$q$ (nm$^{-1}$)", ylabel=L"$v_g^\text{exc.}$ ($\mu$m$\cdot$ps$^{-1}$)")
-    plot_excitonic_vg!(ax, ΩR, Em)
-    axislegend(ax, merge=true)
-    fig
+    return XP.mol_cont .* dEdq
 end
 
 function numerical_derivative_three_point(x, y)
@@ -89,22 +80,7 @@ function numerical_derivative_three_point(x, y)
     return dy_dx
 end
 
-function plot_excitonic_vg!(ax, ΩR, Em)
-    sys = QuantumWire(
-           ΩR = ΩR*eV,
-           ϵ  = 3.0,
-           Nc = 500,
-           Nm = 1001,
-           a  = 10nm,
-           σa = 0,
-           ωM = Em*eV,
-           σM = 0.0,
-           Ly = 200nm,
-           Lz = 400nm,
-           nz = 1,
-           ny = 1
-       )
-    
+function plot_excitonic_vg!(ax; sys, c)
     LP = extract_LP(sys)
     UP = extract_UP(sys)
 
@@ -112,28 +88,13 @@ function plot_excitonic_vg!(ax, ΩR, Em)
     ∂UP = get_excitonic_vg(UP)
 
     #scatter!(ax, LP.qvals, ∂LP, label="LP")
-    lines!(ax, LP.qvals, ∂LP, label="LP", linewidth=3)
+    lines!(ax, LP.qvals, ∂LP, label="LP", linewidth=3, color=c)
 
     #scatter!(ax, UP.qvals, ∂UP, label="UP")
-    lines!(ax, UP.qvals, ∂UP, label="UP", linewidth=3)
+    lines!(ax, UP.qvals, ∂UP, label="UP", linewidth=3, linestyle=:dash, color=c)
 end
 
-function plot_excitonic_wvp!(ax, ΩR, Em, wvps)
-    sys = QuantumWire(
-           ΩR = ΩR*eV,
-           ϵ  = 3.0,
-           Nc = 500,
-           Nm = 1001,
-           a  = 10nm,
-           σa = 0,
-           ωM = Em*eV,
-           σM = 0.0,
-           Ly = 200nm,
-           Lz = 400nm,
-           nz = 1,
-           ny = 1
-       )
-    
+function plot_excitonic_wvp!(ax; sys, wvps, ymax)
     LP = extract_LP(sys)
     UP = extract_UP(sys)
 
@@ -144,8 +105,13 @@ function plot_excitonic_wvp!(ax, ΩR, Em, wvps)
         h = w[3]
         kwvp = get_kwvp(sys, σx, q0)
         kwvp = kwvp ./ maximum(kwvp)
-        cmap = [(:steelblue2, t) for t in kwvp]
-        lines!(ax, LP.qvals, repeat([h], length(LP.qvals)), color=cmap, linewidth=12)
+        if q0 > 0 
+            cmap = [(:salmon3, t) for t in kwvp]
+        else
+            cmap = [(:steelblue2, t) for t in kwvp]
+        end
+        lines!(ax, LP.qvals, repeat([ymax*h], length(LP.qvals)), color=cmap, linewidth=12)
+        text!(ax, 0.01, h+0.02, align=(:left, :bottom), space=:relative, text=L"$\sigma_x = %$σx$ nm", fontsize=15)
     end
 end
 
@@ -157,7 +123,6 @@ function get_kwvp(sys, σx, q0)
     m = sortperm(sys.phot_wavevectors)
     return kwvp[m]
 end
-
 
 function get_ktrans(sys)
     Nm = length(sys.mol_range)
@@ -181,44 +146,96 @@ function get_ktrans(sys)
     return U
 end
 
+function effective_wvp_velocity(sys, σx, q0)
+    kwvp = get_kwvp(sys, σx, q0)
+
+    LP = extract_LP(sys)
+    UP = extract_UP(sys)
+
+    ∂LP = get_excitonic_vg(LP) .^2
+    ∂UP = get_excitonic_vg(UP) .^2
+
+    return sqrt(sum(kwvp .* (∂LP .+ ∂UP)))
+end
+
 # Paper figure
-function plot_excvg()
+function plot_excvg(sysA, sysB, sysC, sysD)
 
     fontsize_theme = Theme(fontsize = 25)
     set_theme!(fontsize_theme)
 
-    fig = Figure(resolution=(800, 400))
+    fig = Figure(resolution=(800, 800))
 
     # Create grid of axes
     gd = fig[1,1] = GridLayout()
 
-    ax1 = Axis(gd[1,1], xlabel=L"$q$ (nm$^{-1}$)", ylabel=L"$v_g^\text{exc.}$ ($\mu$m$\cdot$ps$^{-1}$)")
-    ax2 = Axis(gd[1,2], xlabel=L"$q$ (nm$^{-1}$)", ylabel=L"$v_g^\text{exc.}$ ($\mu$m$\cdot$ps$^{-1}$)")
-    ax3 = Axis(gd[1,3], xlabel=L"$q$ (nm$^{-1}$)", ylabel=L"$v_g^\text{exc.}$ ($\mu$m$\cdot$ps$^{-1}$)")
+    ax1 = Axis(gd[1,1], xticks=[0, 0.005, 0.010])
+    hidexdecorations!(ax1, grid=false, ticks=false)
 
-    ylims!(ax1, 0, 12)
-    xlims!(ax1, 0, 0.015)
+    ax2 = Axis(gd[1,2], xticks=[0, 0.005, 0.010])
+    hidexdecorations!(ax2, grid=false, ticks=false)
+    hideydecorations!(ax2, grid=false, ticks=false)
 
-    ylims!(ax2, 0, 11)
-    xlims!(ax2, 0, 0.015)
+    ax3 = Axis(gd[2,1], xticks=[0, 0.005, 0.010])
+    ax4 = Axis(gd[2,2], xticks=[0, 0.005, 0.010])
+    hideydecorations!(ax4, grid=false, ticks=false)
 
-    ylims!(ax3, 0, 20)
-    xlims!(ax3, 0, 0.015)
+    linkxaxes!(ax4, ax3, ax2, ax1)
+    linkyaxes!(ax4, ax3)
+    linkyaxes!(ax2, ax1)
+
+    ylims!(ax2, 0, 12)
+    ylims!(ax4, 0, 20)
+    xlims!(ax4, -0.002, 0.015)
+
+    wvps0 = [(60, 0.0, 5/6), (120, 0.0, 4/6), (240, 0.0, 3/6), (360, 0.0, 2/6), (480, 0.0, 1/6)]
+    wvps = [(60, 0.0055, 5/6), (120, 0.0055, 4/6), (240, 0.0055, 3/6), (360, 0.0055, 2/6), (480, 0.0055, 1/6)]
+
+    c1 = Makie.wong_colors()[3]
+    c2 = Makie.wong_colors()[2]
+    c3 = Makie.wong_colors()[1]
+    c4 = Makie.wong_colors()[4]
 
     # Rabi analysis
-    plot_excitonic_wvp!(ax1, 0.1, 2.0, [(120, 0.0, 8), (480, 0.0, 4)])
-    plot_excitonic_vg!(ax1, 0.2, 2.0)
-    plot_excitonic_vg!(ax1, 0.1, 2.0)
+    plot_excitonic_wvp!(ax1, sys=sysA, wvps=wvps0, ymax=12)
+    plot_excitonic_vg!(ax1; sys=sysA, c=c1)
+    plot_excitonic_vg!(ax1, sys=sysB, c=c2)
 
-    # q diff 0 analysis
-    plot_excitonic_wvp!(ax2, 0.1, 2.0, [(60, 0.0, 10), (120, 0.0, 8), (240, 0.0, 6), (360, 0.0, 4), (480, 0.0, 2),
-    (60, 0.0055, 9), (120, 0.0055, 7), (240, 0.0055, 5), (360, 0.0055, 3), (480, 0.0055, 1)])
-    plot_excitonic_vg!(ax2, 0.1, 2.0)
+    plot_excitonic_wvp!(ax2, sys=sysA, wvps=wvps, ymax=12)
+    plot_excitonic_vg!(ax2; sys=sysA, c=c1)
+    plot_excitonic_vg!(ax2, sys=sysB, c=c2)
 
     # detuning
-    plot_excitonic_vg!(ax3, 0.1, 1.8)
-    plot_excitonic_vg!(ax3, 0.1, 2.0)
-    plot_excitonic_vg!(ax3, 0.1, 2.2)
+    plot_excitonic_wvp!(ax3, sys=sysA, wvps=wvps0, ymax=20)
+    plot_excitonic_vg!(ax3; sys=sysC, c=c3)
+    plot_excitonic_vg!(ax3, sys=sysA, c=c1)
+    plot_excitonic_vg!(ax3, sys=sysD, c=c4)
+
+    plot_excitonic_wvp!(ax4, sys=sysA, wvps=wvps, ymax=20)
+    plot_excitonic_vg!(ax4; sys=sysC, c=c3)
+    plot_excitonic_vg!(ax4, sys=sysA, c=c1)
+    plot_excitonic_vg!(ax4, sys=sysD, c=c4)
+
+    Label(gd[3,1:2], L"$q$ (nm$^{-1}$)")
+    Label(gd[1:2,0], L"$v_g^\text{exc.}$ ($\mu$m$\cdot$ps$^{-1}$)", rotation=π/2)
+
+
+    n = 0
+    for ax in [ax1, ax2, ax3, ax4]
+        text!(ax, 0.02, 1, align=(:left, :top), space=:relative, text="($('a'+n))", font=:bold, fontsize=20)
+        n += 1
+    end
+
+    group_line = [LineElement(color=:black, linestyle=:solid), LineElement(color=:black, linestyle=:dash)]
+    group_colors = [PolyElement(color=c, strokecolor=:transparent) for c in [c1, c3, c4, c2]]
+    Legend(gd[4,1:2], [group_line, group_colors], [["LP", "UP"], 
+    [L"$\Omega_R = 0.1$ eV $\delta = 0.0$ eV", L"$\Omega_R = 0.1$ eV $\delta = 0.2$ eV", 
+    L"$\Omega_R = 0.1$ eV $\delta = -0.2$ eV", L"$\Omega_R = 0.2$ eV $\delta = 0.0$ eV" ]], 
+    ["", ""], orientation=:horizontal, nbanks=2, titleposition=:left)
+
+    rowgap!(gd, 2, 5)
+    rowgap!(gd, 3, 5)
+    colgap!(gd, 1, 5)
 
     fig
 end
