@@ -11,7 +11,7 @@ function fig2(;σx=120, ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], show_std=fals
 
     # Create grid of axes
     gd = fig[1,1] = GridLayout()
-    ax1 = Axis(gd[1,1], ylabel=L"Escape Probability ($\chi$)")
+    ax1 = Axis(gd[1,1], ylabel=L"Migration Probability ($\chi$)")
     ax2 = Axis(gd[2,1], ylabel=L"RMSD ($\mu$m)", xlabel="Time (ps)",xticks=0:5)
 
     # The inset axis
@@ -34,7 +34,7 @@ function fig2(;σx=120, ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], show_std=fals
     yticklabelsize=15, yticks=[0, 1, 2])
 
     axs = [ax1, ax2, ax3, ax4]
-    # Link axes so they have the same plotting range
+    ## Link axes so they have the same plotting range
     linkxaxes!(ax1,ax2)
     linkxaxes!(ax3,ax4)
 
@@ -43,32 +43,29 @@ function fig2(;σx=120, ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], show_std=fals
     xlims!(ax4, 0.0, 0.5)
     ylims!(ax4, 0, 3)
 
-    # Hide redundant axis info
+    fig2!(axs, σx=σx, ΩR=ΩR, σMvals=σMvals, show_std=show_std, fit=fit)
 
-    #rel_dis = ["$(Int(100*σM/ΩR))%" for σM in σMvals]
-    #rel_dis = ["$(round(100*σM/ΩR, digits=2))%" for σM in σMvals]
-    rel_dis = [format("{:3d}%", Int(100*σM/ΩR)) for σM in σMvals]
-
-    clrs = Makie.wong_colors()
-    for i = eachindex(σMvals) 
-        c = clrs[i]
-        escp_over_time!(axs[1], ΩR=ΩR, σx=σx, σM=σMvals[i],color=c,label=rel_dis[i])
-        rmsd_propagation!(axs[2], ΩR=ΩR, σx=σx, σM=σMvals[i], color=c, show_std=show_std, fit=fit)
-        escp_over_time!(axs[3], ΩR=ΩR, σx=σx, σM=σMvals[i],color=c,label=rel_dis[i], mksize=3)
-        rmsd_propagation!(axs[4], ΩR=ΩR, σx=σx, σM=σMvals[i], color=c, show_std=show_std, fit=fit)
-    end
-
-    text!(ax1, 0.1, 1, text="(a)", align=(:right, :top), space=:relative, font=:bold, fontsize=25)
-    text!(ax2, 0.1, 1, text="(b)", align=(:right, :top), space=:relative, font=:bold, fontsize=25)
-    #linkxaxes!(ax1, ax2)
-
-  
     Legend(gd[3,1], ax1, L"\sigma_M/\Omega_R", merge=true, orientation=:horizontal, labelsize=20, titleposition=:left)
 
     rowgap!(gd, 2, 5)
     fig
 end
 
+function fig2!(axs; σx=120, ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], show_std=false, fit=true, plotlabel=["(a)", "(b)"])
+    rel_dis = [format("{:3d}%", Int(round(100*σM/ΩR, digits=0))) for σM in σMvals]
+
+    clrs = Makie.wong_colors()
+    for i = eachindex(σMvals) 
+        c = clrs[i]
+        escp_over_time!(axs[1], ΩR=ΩR, σx=σx, σM=σMvals[i],color=c,label=rel_dis[i])
+        rmsd_propagation!(axs[2], ΩR=ΩR, σx=σx, σM=σMvals[i], color=c, show_std=show_std, fit=fit, label=rel_dis[i])
+        escp_over_time!(axs[3], ΩR=ΩR, σx=σx, σM=σMvals[i],color=c,label=rel_dis[i], mksize=3)
+        rmsd_propagation!(axs[4], ΩR=ΩR, σx=σx, σM=σMvals[i], color=c, show_std=show_std, fit=fit)
+    end
+
+    text!(axs[1], 0.15, 1, text=plotlabel[1], align=(:right, :top), space=:relative, font=:bold, fontsize=25)
+    text!(axs[2], 0.15, 1, text=plotlabel[2], align=(:right, :top), space=:relative, font=:bold, fontsize=25)
+end
 
 function wvp_fig2(;σxvals=[120, 480], ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], show_std=false)
 

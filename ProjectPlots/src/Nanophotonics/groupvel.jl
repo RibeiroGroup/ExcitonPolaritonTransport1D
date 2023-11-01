@@ -61,7 +61,6 @@ function get_excitonic_vg(XP)
     #    ∂XP[i] = XP.mol_cont[i] .* (δE / δq) / (1000*ħ) # Convert to μm/ps
     #end
     dEdq = numerical_derivative_three_point(XP.qvals, XP.evals) ./ (1000*ħ)
-    
     return XP.mol_cont .* dEdq
 end
 
@@ -152,8 +151,8 @@ function effective_wvp_velocity(sys, σx, q0)
     LP = extract_LP(sys)
     UP = extract_UP(sys)
 
-    ∂LP = get_excitonic_vg(LP) .^2
-    ∂UP = get_excitonic_vg(UP) .^2
+    ∂LP = get_excitonic_vg(LP).^2
+    ∂UP = get_excitonic_vg(UP).^2
 
     return sqrt(sum(kwvp .* (∂LP .+ ∂UP)))
 end
@@ -236,6 +235,96 @@ function plot_excvg(sysA, sysB, sysC, sysD)
     rowgap!(gd, 2, 5)
     rowgap!(gd, 3, 5)
     colgap!(gd, 1, 5)
+
+    fig
+end
+
+function plot_AA(sysA, sysC, sysD, q)
+
+    fontsize_theme = Theme(fontsize = 25)
+    set_theme!(fontsize_theme)
+
+    fig = Figure(resolution=(800, 600))
+
+    # Create grid of axes
+    gd = fig[1,1] = GridLayout()
+
+    ax1 = Axis(gd[1,1], xticks=[0, 0.005, 0.010], ylabel=L"$v_g^\text{exc.}$ ($\mu$m$\cdot$ps$^{-1}$)", xlabel=L"$q$ (nm$^{-1}$)")
+
+    ylims!(ax1, 0, 20)
+    xlims!(ax1, -0.002, 0.015)
+
+    wvps = [(60, q, 5/6), (120, q, 4/6), (240, q, 3/6), (360, q, 2/6), (480, q, 1/6)]
+
+    c1 = Makie.wong_colors()[3]
+    c2 = Makie.wong_colors()[2]
+    c3 = Makie.wong_colors()[1]
+    c4 = Makie.wong_colors()[4]
+
+    # detuning
+    plot_excitonic_wvp!(ax1, sys=sysA, wvps=wvps, ymax=20)
+    plot_excitonic_vg!(ax1; sys=sysC, c=c3)
+    plot_excitonic_vg!(ax1, sys=sysA, c=c1)
+    plot_excitonic_vg!(ax1, sys=sysD, c=c4)
+
+    #n = 0
+    #for ax in [ax1, ax2, ax3, ax4]
+    #    text!(ax, 0.02, 1, align=(:left, :top), space=:relative, text="($('a'+n))", font=:bold, fontsize=20)
+    #    n += 1
+    #end
+
+    group_line = [LineElement(color=:black, linestyle=:solid), LineElement(color=:black, linestyle=:dash)]
+    group_colors = [PolyElement(color=c, strokecolor=:transparent) for c in [c3, c1, c4]]
+    Legend(gd[1,2], [group_line, group_colors], [["LP", "UP"], 
+    string.([-0.2, 0.0, 0.2])],
+    ["", L"$\delta$ (eV)"], orientation=:vertical, tellheight=false)
+
+    fig
+end
+
+function plot_vg_vs_rabi(sysA, sysB)
+
+    fontsize_theme = Theme(fontsize = 25)
+    set_theme!(fontsize_theme)
+
+    fig = Figure(resolution=(800, 800))
+
+    # Create grid of axes
+    gd = fig[1,1] = GridLayout()
+
+    ax1 = Axis(gd[1,1], xticks=[0, 0.005, 0.010], ylabel=L"$v_g^\text{exc.}$ ($\mu$m$\cdot$ps$^{-1}$)")
+    #hidexdecorations!(ax1, grid=false, ticks=false)
+
+    ax2 = Axis(gd[1,2], xticks=[0, 0.005, 0.010])
+    #hidexdecorations!(ax2, grid=false, ticks=false)
+    #hideydecorations!(ax2, grid=false, ticks=false)
+
+    linkaxes!(ax1, ax2)
+
+    ylims!(ax2, 0, 12)
+    xlims!(ax2, -0.002, 0.015)
+
+    wvps0 = [(60, 0.0, 5/6), (120, 0.0, 4/6), (240, 0.0, 3/6), (360, 0.0, 2/6), (480, 0.0, 1/6)]
+    wvps = [(60, 0.0055, 5/6), (120, 0.0055, 4/6), (240, 0.0055, 3/6), (360, 0.0055, 2/6), (480, 0.0055, 1/6)]
+
+    c1 = Makie.wong_colors()[3]
+    c2 = Makie.wong_colors()[2]
+    #c3 = Makie.wong_colors()[1]
+    #c4 = Makie.wong_colors()[4]
+
+    # Rabi analysis
+    plot_excitonic_wvp!(ax1, sys=sysA, wvps=wvps0, ymax=12)
+    plot_excitonic_vg!(ax1; sys=sysA, c=c1)
+    plot_excitonic_vg!(ax1, sys=sysB, c=c2)
+
+    plot_excitonic_wvp!(ax2, sys=sysA, wvps=wvps, ymax=12)
+    plot_excitonic_vg!(ax2; sys=sysA, c=c1)
+    plot_excitonic_vg!(ax2, sys=sysB, c=c2)
+
+    Label(gd[2,1:2], L"$q$ (nm$^{-1}$)")
+
+    text!(ax1, 0.02, 1, align=(:left, :top), space=:relative, text="(a)", font=:bold, fontsize=20)
+    text!(ax2, 0.02, 1, align=(:left, :top), space=:relative, text="(b)", font=:bold, fontsize=20)
 
     fig
 end
