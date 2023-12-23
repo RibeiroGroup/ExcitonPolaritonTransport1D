@@ -1,0 +1,164 @@
+Initilizing Simulation.
+December, 23 2023 - 10:36:30
+Starting Realization 1
+           ---Quantum System Input Parameters---       
+
+              # Light-Matter Interaction #             
+Rabi Frequency (ΩR):                                   0.1 eV
+
+                # Molecular Properties #               
+Number of molecules (Nm):                              5000
+Average intermolecular distance (a):                   10.0 nm
+Intermolecular distance standard deviation (σa):       1.0 nm
+Average molecular excitation energy (ωM):              5.0 eV
+Molecular excitation energy standard deviation (σM):   0.4 eV
+
+                # Cavity/Wire Properties #               
+Number of positive cavity modes (Nc):                  500
+Cavity y dimension size (Ly):                          200 nm
+Cavity z dimension size (Lz):                          400 nm
+y-momentum quantum number (ny):                        1
+z-momentum quantum number (nz):                        1
+Index of refraction squared (ϵ):                       3.0
+
+Length along x (Nm * a) 50000.00000000 nm
+
+ Minimum Cavity energy:    2.0007863989
+ Maximum Cavity energy:    7.4325915905
+
+ # Total System Dimensions: 6001x6001
+Memory required for Hamiltonian Matrix: 0.576 Gb | 576.192 Mb
+
+## Constructing Hamiltonian Matrix
+Allocating memory... Done.
+Populating diagonal... Done.
+Populating off-diagonal... Done.
+
+## Diagonalization
+BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
+BLAS Number of Threads: 28
+
+Diagonalization started... Done in  158.64991 seconds.
+
+
+ --- System Summary
+
+ Molecular Energies (eV)
+              ┌                                        ┐ 
+   [3.4, 3.6) ┤▏ 2                                       
+   [3.6, 3.8) ┤▎ 7                                       
+   [3.8, 4.0) ┤▋ 19                                      
+   [4.0, 4.2) ┤██▋ 80                                    
+   [4.2, 4.4) ┤███████▎ 220                              
+   [4.4, 4.6) ┤█████████████▉ 426                        
+   [4.6, 4.8) ┤█████████████████████████▍ 771            
+   [4.8, 5.0) ┤█████████████████████████████████  1 006  
+   [5.0, 5.2) ┤██████████████████████████████▊ 939       
+   [5.2, 5.4) ┤████████████████████████▊ 758             
+   [5.4, 5.6) ┤██████████████▎ 431                       
+   [5.6, 5.8) ┤███████▎ 220                              
+   [5.8, 6.0) ┤██▊ 87                                    
+   [6.0, 6.2) ┤▊ 27                                      
+   [6.2, 6.4) ┤▎ 6                                       
+   [6.4, 6.6) ┤▏ 1                                       
+              └                                        ┘ 
+                               Frequency                 
+
+ Cavity Energies
+                 ┌────────────────────────────────────────┐ 
+               8 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠆⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠞⠁⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡤⠊⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠔⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+   Energy (ev)   │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡠⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡴⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣠⠖⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡤⠞⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣠⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⢀⣠⠖⠋⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+               2 │⣀⣀⣀⡤⠴⠚⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 └────────────────────────────────────────┘ 
+                 ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀1 100⠀ 
+                 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀q⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+
+ System Eigenenergies
+                 ┌────────────────────────────────────────┐ 
+               8 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⡇⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢸⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⡏⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⣀⡼⠁⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣠⠤⠴⠒⠋⠁⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⢀⣀⣀⣠⠤⠤⠤⠖⠒⠒⠚⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+   Energy (ev)   │⠀⠀⠀⢀⣠⠤⠖⠚⠉⠉⠉⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⢠⠏⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⡎⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⢰⠃⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⡞⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⡼⠁⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+               1 │⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀│ 
+                 └────────────────────────────────────────┘ 
+                 ⠀0⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀7 000⠀ 
+                 ⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀Eigenstate index⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀⠀ 
+
+
+## Starting time evolution
+
+
+• Wavepacket created with σ = 60.0 nm centered at 25000 nm
+
+
+• Wavepacket created with σ = 120.0 nm centered at 25000 nm
+
+
+• Wavepacket created with σ = 240.0 nm centered at 25000 nm
+
+
+• Wavepacket created with σ = 360.0 nm centered at 25000 nm
+
+
+• Wavepacket created with σ = 480.0 nm centered at 25000 nm
+Starting Realization 2
+           ---Quantum System Input Parameters---       
+
+              # Light-Matter Interaction #             
+Rabi Frequency (ΩR):                                   0.1 eV
+
+                # Molecular Properties #               
+Number of molecules (Nm):                              5000
+Average intermolecular distance (a):                   10.0 nm
+Intermolecular distance standard deviation (σa):       1.0 nm
+Average molecular excitation energy (ωM):              5.0 eV
+Molecular excitation energy standard deviation (σM):   0.4 eV
+
+                # Cavity/Wire Properties #               
+Number of positive cavity modes (Nc):                  500
+Cavity y dimension size (Ly):                          200 nm
+Cavity z dimension size (Lz):                          400 nm
+y-momentum quantum number (ny):                        1
+z-momentum quantum number (nz):                        1
+Index of refraction squared (ϵ):                       3.0
+
+Length along x (Nm * a) 50000.00000000 nm
+
+ Minimum Cavity energy:    2.0007863989
+ Maximum Cavity energy:    7.4325915905
+
+ # Total System Dimensions: 6001x6001
+Memory required for Hamiltonian Matrix: 0.576 Gb | 576.192 Mb
+
+## Constructing Hamiltonian Matrix
+Allocating memory... Done.
+Populating diagonal... Done.
+Populating off-diagonal... Done.
+
+## Diagonalization
+BLAS Config: LBTConfig([ILP64] libmkl_rt.so, [LP64] libmkl_rt.so)
+BLAS Number of Threads: 28
+
+Diagonalization started... 
