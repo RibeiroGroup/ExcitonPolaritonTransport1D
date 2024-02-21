@@ -2,3 +2,4 @@
 *test.png
 *article_figures/*
 *.ipynb_*
+.vscode

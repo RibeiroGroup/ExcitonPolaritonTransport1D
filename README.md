@@ -50,7 +50,7 @@ Figure 4: `ProjectPlots.Nanophotonics.fig4()` \
 Figure 5: `ProjectPlots.Nanophotonics.fig5()` \
 Figure 6: `ProjectPlots.Nanophotonics.fig6()` \
 Figure 7: `ProjectPlots.Nanophotonics.fig7()` \
-Figure 8: `ProjectPlots.Nanophotonics.fig8()` \
+Figure 8: `ProjectPlots.Nanophotonics.fig8()` 
 
 In this case each function is associated with a file named accordingly. For example, the function that creates Figure 3 is found in the file `ProjectPlots/src/Nanophotonics/fig3.jl`. 
 
