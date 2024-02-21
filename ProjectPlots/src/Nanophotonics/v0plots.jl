@@ -63,9 +63,9 @@ function v0_vs_reldis()
     fig
 end
 
-function v0_vs_reldis!(ax::Axis; σx=120)
+function v0_vs_reldis!(ax::Axis; σx=120, fit_t_max=0.5)
 
-    r1 = 0:0.005:0.5
+    r1 = 0:0.005:fit_t_max
 
     ΩRvals = [0.05, 0.1, 0.2, 0.3]
     σMvals = [0.005, 0.01, 0.02, 0.04, 0.08, 0.1, 0.2, 0.3, 0.4, 0.5]

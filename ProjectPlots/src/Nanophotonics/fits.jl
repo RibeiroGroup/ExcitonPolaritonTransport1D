@@ -34,8 +34,8 @@ function residual(xvals, yvals, coef)
     tot = 0.0
     avgy = sum(yvals) / length(yvals)
     for (x,y) in zip(xvals, yvals)
-        res = (y - eval_poly(x, coef))^2
-        tot = (y - avgy)^2
+        res += (y - eval_poly(x, coef))^2
+        tot += (y - avgy)^2
     end
 
     return 1 - res/tot

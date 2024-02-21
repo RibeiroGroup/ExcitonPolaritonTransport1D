@@ -1,5 +1,4 @@
 function escp_over_time!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, color=Makie.wong_colors()[1], label="", fit=false, mksize=9)
-
     # Get time values
     r1 = 0:0.005:0.5
     r2 = 1.0:0.5:5
@@ -16,7 +15,6 @@ function escp_over_time!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=
     scatter!(ax, tvals, escp, color=color, label=label, markersize=mksize)
     lines!(ax, tvals, escp, color=color, label=label)
 end
-
 
 function wvp_escape_probability(ΩR, σx, σM, idx)
 
@@ -35,6 +33,7 @@ function wvp_escape_probability(ΩR, σx, σM, idx)
     s = 0
     r = nothing
     while s < 0.998
+    #while s < 0.1
         n += 1
         r = (50-n+1):(50+n)
         s = sum(wvp0[r])
@@ -42,9 +41,12 @@ function wvp_escape_probability(ΩR, σx, σM, idx)
             break
         end
     end
+    #n = 1
+    #r = (50-n+1):(50+n)
 
     # Print probability of exciton at the "boundary" for the last time step
     if idx == 110
+        println("n val = $n")
         println(wvp[1] + wvp[end])
         println(r)
     end

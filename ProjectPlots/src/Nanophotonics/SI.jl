@@ -1,3 +1,5 @@
+using Statistics
+
 function SI_fig1(; ΩR=0.1, σx=120, σMvals=[0.04, 0.1, 0.2, 0.3], t=1)
     fontsize_theme = Theme(fontsize=20)
     set_theme!(fontsize_theme)
@@ -414,4 +416,255 @@ function plot_ω2UP!(ax, Emol; color=Makie.wong_colors()[1], label="", mksize=5)
     end
 
     scatter!(ax, UP_k[1:end-2], ∂2UP, markersize=mksize, color=color, label=label)
+end
+
+function plot_term_prob(;σx=120, ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], N=1)
+    fontsize_theme = Theme(fontsize = 25)
+    set_theme!(fontsize_theme)
+
+    fig = Figure(resolution=(900, 500))
+
+    # Create grid of axes
+    gd = fig[1,1] = GridLayout()
+    ax1 = Axis(gd[1,1], ylabel="Probability", xticks=0:4)
+    ax2 = Axis(gd[1,2], xticks=0:4)
+    xlims!(ax1, 0,5)
+    xlims!(ax2, 0,5)
+
+    rel_dis = [format("{:3d}%", Int(round(100*σM/ΩR, digits=0))) for σM in σMvals]
+
+    clrs = Makie.wong_colors()
+    for i = eachindex(σMvals) 
+        c = clrs[i]
+        prob_at_end_sites!(ax1, ΩR=ΩR, σx=σx, σM=σMvals[i], N=1, color=c, label=rel_dis[i])
+        prob_at_end_sites!(ax2, ΩR=ΩR, σx=σx, σM=σMvals[i], N=5, color=c, label=rel_dis[i])
+    end
+
+    text!(ax1, 0.01, 0.98, text="(a) 100 sites", space=:relative, align=(:left, :top), fontsize=23)
+    text!(ax2, 0.01, 0.98, text="(b) 500 sites", space=:relative, align=(:left, :top), fontsize=23)
+
+    Label(gd[2,1:2], "Time (ps)")
+    Legend(gd[1,3], ax1, L"\sigma_M/\Omega_R", merge=true)
+    rowgap!(gd, 1, 1)
+    fig
+end
+
+#function fig2!(axs; σx=120, ΩR=0.1, σMvals = [0.02, 0.04, 0.1, 0.2], show_std=false, fit=true, plotlabel=["(a)", "(b)"])
+#    rel_dis = [format("{:3d}%", Int(round(100*σM/ΩR, digits=0))) for σM in σMvals]
+#
+#    clrs = Makie.wong_colors()
+#    for i = eachindex(σMvals) 
+#        c = clrs[i]
+#        escp!(axs[1], ΩR=ΩR, σx=σx, σM=σMvals[i],color=c,label=rel_dis[i])
+#        #escp_over_time!(axs[1], ΩR=ΩR, σx=σx, σM=σMvals[i],color=c,label=rel_dis[i])
+#        rmsd_propagation!(axs[2], ΩR=ΩR, σx=σx, σM=σMvals[i], color=c, show_std=show_std, fit=fit, label=rel_dis[i])
+#        #escp_over_time!(axs[3], ΩR=ΩR, σx=σx, σM=σMvals[i],color=c,label=rel_dis[i], mksize=3)
+#        escp!(axs[3], ΩR=ΩR, σx=σx, σM=σMvals[i],color=c,label=rel_dis[i], mksize=3)
+#        rmsd_propagation!(axs[4], ΩR=ΩR, σx=σx, σM=σMvals[i], color=c, show_std=show_std, fit=fit)
+#    end
+#
+#    text!(axs[1], 0.15, 1, text=plotlabel[1], align=(:right, :top), space=:relative, font=:bold, fontsize=25)
+#    text!(axs[2], 0.15, 1, text=plotlabel[2], align=(:right, :top), space=:relative, font=:bold, fontsize=25)
+#end
+
+function SI_fig5(;σx=240)
+    fontsize_theme = Theme(fontsize = 23)
+    set_theme!(fontsize_theme)
+
+    fig = Figure(resolution=(800, 800))
+    gd = fig[1,1] = GridLayout()
+
+    ax1 = Axis(gd[1,1], xticks=[-0.2, -0.1, 0.0, 0.1, 0.2], title=L"\bar{q}_0 = 0.0")
+    ax2 = Axis(gd[1,2], xticks=[-0.2, -0.1, 0.0, 0.1, 0.2], title=L"$\bar{q}_0 = 0.008$ nm$^{-1}$")
+    ax3 = Axis(gd[2,1], xticks=[-0.2, -0.1, 0.0, 0.1, 0.2])
+    ax4 = Axis(gd[2,2], xticks=[-0.2, -0.1, 0.0, 0.1, 0.2])
+    ax5 = Axis(gd[3,1], xticks=[-0.2, -0.1, 0.0, 0.1, 0.2])
+    ax6 = Axis(gd[3,2], xticks=[-0.2, -0.1, 0.0, 0.1, 0.2])
+    ax7 = Axis(gd[4,1], xticks=[-0.2, -0.1, 0.0, 0.1, 0.2])
+    ax8 = Axis(gd[4,2], xticks=[-0.2, -0.1, 0.0, 0.1, 0.2])
+    axs = [ax1, ax2, ax3, ax4, ax5, ax6, ax7, ax8]
+    linkaxes!(axs...)
+    xlims!(ax8, -0.22, 0.22)
+
+    for i = 1:6
+        hidexdecorations!(axs[i], grid=false, ticks=false)
+    end
+
+    for i = [2, 4, 6, 8]
+        hideydecorations!(axs[i], grid=false, ticks=false)
+    end
+
+    for (j,σx) in zip([1, 3, 5, 7], [60, 120, 240, 480])
+        for (i,σM) in enumerate([0.005, 0.02, 0.04, 0.1])
+            nzq_v0_vs_detuning!(axs[j+1], σx=σx, σM=σM,label="$(10*σM)", color=Makie.Cycled(i))
+            v0_vs_detuning!(axs[j], σx=σx, σM=σM,label="$(10*σM)", color=Makie.Cycled(i))
+        end
+    end
+
+    Label(gd[5,1:2], L"Detuning $\delta = \hbar\omega_0 - E_M$ (eV)")
+    Label(gd[1:4,0], L"$v_0$ ($\mu$m$\cdot$ps$^{-1}$)", rotation=π/2)
+    Legend(gd[6,1:2], ax1, L"\sigma_M/\Omega_R", orientation=:horizontal, merge=true, titleposition=:left)
+
+    rowgap!(gd, 1, Relative(0.008))
+    rowgap!(gd, 2, Relative(0.008))
+    rowgap!(gd, 3, Relative(0.008))
+    rowgap!(gd, 4, Relative(0.008))
+    rowgap!(gd, 5, Relative(0.008))
+    colgap!(gd, 1, Relative(0.008))
+
+    for i in 1:8
+        l = '`' + i
+        σx = [60, 60, 120, 120, 240, 240, 480, 480][i]
+        text!(axs[i], -0.1, 20, align=(:left, :bottom), text=L"(%$l) $\sigma_x = %$σx$ nm")
+    end
+
+    fig
+end
+
+function SI_extrafig5(;σx=240)
+    fontsize_theme = Theme(fontsize = 25)
+    set_theme!(fontsize_theme)
+
+    fig = Figure(resolution=(800, 400))
+    gd = fig[1,1] = GridLayout()
+
+    ax1 = Axis(gd[1,1], ylabel=L"$v_0$ ($\mu$m$\cdot$ps$^{-1}$)")
+    ax2 = Axis(gd[1,2], ylabel=L"Maximum RMSD ($\mu$m)")
+    linkxaxes!(ax1, ax2)
+
+    for (i,σM) in enumerate([0.01, 0.02, 0.04, 0.1])
+    # Plot detuning effect on v0
+        v0_vs_detuning!(ax1, σx=σx, σM=σM,label="$(10*σM)", color=Makie.Cycled(i), Emvals=[1.8, 1.9, 2.0, 2.1, 2.2, 2.5, 3.0, 4.0, 5.0])
+        maxd_vs_detuning!(ax2, σx=σx, σM=σM,label="$(10*σM)", color=Makie.Cycled(i), Emvals=[1.8, 1.9, 2.0, 2.1, 2.2, 2.5, 3.0, 4.0, 5.0])
+    end
+
+    Label(gd[2,1:2], L"Detuning $\delta = \hbar\omega_0 - E_M$ (eV)")
+    Legend(gd[3,1:2], ax1, L"\sigma_M/\Omega_R", orientation=:horizontal, merge=true, titleposition=:left)
+
+    text!(ax1, 0.01, 0.98, text="(a)", space=:relative, align=(:left, :top), font=:bold, fontsize=22)
+    text!(ax2, 0.01, 0.98, text="(b)", space=:relative, align=(:left, :top), font=:bold, fontsize=22)
+
+    rowgap!(gd, 1, Relative(0.008))
+    rowgap!(gd, 2, Relative(0.008))
+
+    fig
+end
+
+function SI_rabi_oscillations(;σx=120)
+
+
+    r1 = 0:0.005:0.5
+    r2 = 1.0:0.5:5
+    tvals = vcat(r1, r2)
+    fontsize_theme = Theme(fontsize = 25)
+    set_theme!(fontsize_theme)
+
+    fig = Figure(resolution=(800, 500))
+    gd = fig[1,1] = GridLayout()
+
+    ax1 = Axis(gd[1,1], xticks=[0, 50, 100, 150, 200, 250], title="(a)", titlealign=:left)
+    ax2 = Axis(gd[2,1], xticks=[0, 20, 40, 60, 80], title="(b)", titlealign=:left)
+    xlims!(ax1, 0, 260)
+    xlims!(ax2, 0, 60)
+
+    mk = vcat(repeat([:circle], 4), repeat([:diamond], 4))
+    axs = vcat(repeat([ax1], 4), repeat([ax2], 4))
+    cl = vcat(Makie.wong_colors()[1:7], Makie.wong_colors()[1])
+
+    for (i,σM) in enumerate([0.005, 0.01, 0.02, 0.04, 0.08, 0.1, 0.2, 0.3])
+        sm = replace(string(σM), "." => "p") 
+        path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R0p1/sm$sm/out.h5")
+        wvp = h5read(path, "$(Int(σx))_avg_wvp")
+        PM = [sum(wvp[:,t]) for t in axes(wvp, 2)]        
+        scatter!(axs[i], 1000*tvals, PM, label="$(10*σM)", marker=mk[i], color=cl[i])
+        lines!(axs[i], 1000*tvals, PM, label="$(10*σM)", color=cl[i])
+    end
+
+    Legend(gd[1,2], ax1, L"\sigma_M/\Omega_R", orientation=:vertical, merge=true, titleposition=:top, nbanks=2)
+    Legend(gd[2,2], ax2, L"\sigma_M/\Omega_R", orientation=:vertical, merge=true, titleposition=:top, nbanks=2)
+    Label(gd[1:2, 0], L"Excitonic Probability ($P_M$)", rotation=π/2, tellheight=false)
+    Label(gd[3, 1], "Time (fs)", tellwidth=false)
+
+    rowgap!(gd, 1, Relative(0.015))
+    rowgap!(gd, 2, Relative(0.015))
+
+    fig
+end
+
+function SI_dispersion()
+
+    path = joinpath(@__DIR__, "../../../dispersion_curves/disorder/out.h5")
+    fontsize_theme = Theme(fontsize = 22)
+    set_theme!(fontsize_theme)
+    fig = Figure(resolution=(800, 600))
+
+    gd = fig[1,1] = GridLayout()
+
+    axs = [
+        Axis(gd[i,j]) for i = 1:3, j = 1:2
+    ]
+
+    σMvals = [0.01, 0.02, 0.04, 0.08, 0.1, 0.2]
+
+    for i in eachindex(σMvals)
+
+        σM = σMvals[i]
+        sm = replace(string(σM), "." => "p")
+
+        lt = '`' + i
+        axs[i].title = L"(%$lt) $\sigma_M / \Omega_R = %$(10*σM)"
+
+        xlims!(axs[i], -0.005, 0.005)
+        ylims!(axs[i], 1.9, 2.1)
+
+        qup = h5read(path, "$(sm)_up_q")
+        up = h5read(path, "$(sm)_up")
+        qlp = h5read(path, "$(sm)_lp_q")
+        lp = h5read(path, "$(sm)_lp")
+
+        x1, y1, σ1 = remove_duplicates_and_average(qup, up)
+        x2, y2, σ2 = remove_duplicates_and_average(qlp, lp)
+
+        if i != 3 && i != 6
+            hidexdecorations!(axs[i], grid=false, ticks=false)
+        end
+
+        if i > 3
+            hideydecorations!(axs[i], grid=false, ticks=false)
+        end
+
+        #scatter!(axs[i], qup, up, markersize=9)
+        #scatter!(axs[i], qlp, lp, markersize=9)
+        scatter!(axs[i], x1, y1)
+        errorbars!(axs[i], x1, y1, 3*σ1, color=Makie.wong_colors()[1])
+
+        scatter!(axs[i], x2, y2)
+        errorbars!(axs[i], x2, y2, 3*σ2, color=Makie.wong_colors()[2])
+        hlines!(axs[i], [2.0], linestyle=:dash, color=:gray)
+
+        phot_q = h5read(path, "phot_q")
+        phot_e = h5read(path, "phot_e")
+        s = sortperm(phot_q)
+        lines!(axs[i], phot_q[s], phot_e[s], color=:gray, linestyle=:dash)
+    end
+
+    Label(gd[1:3, 0], "Energy (eV)", rotation=π/2)
+    Label(gd[4,1:2], L"q (nm$^{-1}$)")
+
+    colgap!(gd, 1, Relative(0.015))
+    colgap!(gd, 2, Relative(0.015))
+
+    rowgap!(gd, 1, Relative(0.015))
+    rowgap!(gd, 2, Relative(0.015))
+    rowgap!(gd, 3, Relative(0.015))
+
+
+    fig
+end
+
+function remove_duplicates_and_average(x, y)
+    unique_x = unique(x)
+    averaged_y = [mean(y[x .== xi]) for xi in unique_x]
+    std_y = [std(y[x .== xi]) for xi in unique_x]
+    return unique_x, averaged_y, std_y
 end

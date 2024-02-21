@@ -3,11 +3,12 @@ using HDF5
 using LaTeXStrings
 
 
-function rmsd_propagation!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, show_std=false, color=Makie.wong_colors()[1], label="", fit=false)
+function rmsd_propagation!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, Em::Float64=2.0, show_std=false, color=Makie.wong_colors()[1], label="", fit=false)
 
 	Rstr = replace(string(ΩR), "." => "p") 
+	Estr = replace(string(Em), "." => "p") 
     sm = replace(string(σM), "." => "p") 
-    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
+    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em$Estr/R$Rstr/sm$sm/out.h5")
     #path = joinpath(@__DIR__, "../../../propagation_study/non_zero_q/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
 
     # Get time values
@@ -240,4 +241,27 @@ function d_log!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, sh
     #scatter!(ax, tvals, d, color=color, label=label)
     #lines!(ax, τ[2:end], der, color=color, label=label)
     lines!(ax, τ, logd, color=color, label=label)
+end
+
+function prob_at_end_sites!(ax::Axis; ΩR::Float64=0.1, σx::Int=120, σM::Float64=0.005, N=1, color=Makie.wong_colors()[1], label="")
+
+	Rstr = replace(string(ΩR), "." => "p") 
+    sm = replace(string(σM), "." => "p") 
+    path = joinpath(@__DIR__, "../../../propagation_study/disorder/Nm5000_Nc500_a10_Em2p0/R$Rstr/sm$sm/out.h5")
+
+    # Get time values
+    r1 = 0:0.005:0.5
+    r2 = 1.0:0.5:5
+    tvals = vcat(r1, r2)
+
+    prob = zeros(length(tvals))
+
+    for i in eachindex(tvals)
+        wvp = h5read(path, "$(Int(σx))_avg_wvp", (:, i))
+        prob[i] = sum(wvp[1:N]) + sum(wvp[(end-N+1):end])
+    end
+
+
+    lines!(ax, tvals, prob, color=color, label=label, linewidth=3)
+    scatter!(ax, tvals, prob, color=color, label=label, linewidth=3)
 end
